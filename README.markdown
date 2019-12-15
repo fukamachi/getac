@@ -6,12 +6,13 @@ Unit testing CLI tool for competitive programming.
 
 ## Supported languages
 
+* Clojure
 * Common Lisp
-* Python
 * Go
-* Ruby
 * Java
 * Node.js
+* Python
+* Ruby
 
 ## Usage
 

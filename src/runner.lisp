@@ -23,7 +23,8 @@
              ("execute" . (compile-to))))
     ("java" . (("compile" . ("javac" "-d" compile-in file))
                ("execute" . ("java" "-cp" compile-in filename))))
-    ("javascript" . (("execute" . ("node" file))))))
+    ("javascript" . (("execute" . ("node" file))))
+    ("clojure" . (("execute" . ("clj" file))))))
 
 (defun render-command (command-template values)
   (mapcar (lambda (x)
@@ -109,6 +110,7 @@
       ((string= type "py") "python")
       ((string= type "rb") "ruby")
       ((string= type "js") "javascript")
+      ((string= type "clj") "clojure")
       (t type))))
 
 (defun run-file (file input &key compile-to filetype)
