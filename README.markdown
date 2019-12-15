@@ -28,6 +28,15 @@ OPTIONS:
         Turn off colors. (Default: false)
     --h, --help
         Show help.
+
+# Run with the default Python
+$ get-accepted main.py
+
+# Specify test cases
+$ get-accepted -t test-cases.in main.py
+
+# Run with PyPy3
+$ get-accepted -f pypy3 main.py
 ```
 
 ## Getting started
