@@ -65,7 +65,12 @@
 
 (defun report-compilation-error (test-name error)
   (declare (ignore error))
-  (print-first-line "CE" :red test-name))
+  (print-first-line "CE" :red test-name)
+  (format t "~&  ~A~%"
+          (color-text :gray
+                      (format nil "While executing ~{~A~^ ~}~2%  ~A"
+                              (subprocess-error-command error)
+                              (subprocess-error-output error)))))
 
 (defun report-runtime-error (test-name error)
   (print-first-line "RE" :red test-name)
