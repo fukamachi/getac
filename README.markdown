@@ -10,6 +10,7 @@ Unit testing CLI tool for competitive programming.
 * Python
 * Go
 * Ruby
+* Java
 
 ## Usage
 

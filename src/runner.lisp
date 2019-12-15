@@ -20,7 +20,9 @@
     ("pypy3" . (("execute" . ("pypy3" file))))
     ("ruby" . (("execute" . ("ruby" "--disable-gems" file))))
     ("go" . (("compile" . ("go" "build" "-o" compile-to file))
-             ("execute" . (compile-to))))))
+             ("execute" . (compile-to))))
+    ("java" . (("compile" . ("javac" "-d" compile-in file))
+               ("execute" . ("java" "-cp" compile-in filename))))))
 
 (defun render-command (command-template values)
   (mapcar (lambda (x)
@@ -58,8 +60,11 @@
   (check-type input string)
   (let ((command (render-command command-template
                                  `((file . ,(uiop:native-namestring file))
+                                   (filename . ,(pathname-name file))
                                    (compile-to . ,(and compile-to
-                                                       (uiop:native-namestring compile-to))))))
+                                                       (uiop:native-namestring compile-to)))
+                                   (compile-in . ,(and compile-to
+                                                       (uiop:native-namestring (uiop:pathname-directory-pathname compile-to)))))))
         (errout (make-string-output-stream))
         (took-ms 0))
     (with-input-from-string (in input)
@@ -83,7 +88,8 @@
                          (uiop:with-temporary-file (:pathname file :keep t) file)))
          (command (render-command command-template
                                   `((file . ,(uiop:native-namestring file))
-                                    (compile-to . ,(uiop:native-namestring compile-to)))))
+                                    (compile-to . ,(uiop:native-namestring compile-to))
+                                    (compile-in . ,(uiop:native-namestring (uiop:pathname-directory-pathname compile-to))))))
          (errout (make-string-output-stream)))
     (handler-case (uiop:run-program command
                                     :input t
@@ -114,8 +120,11 @@
     ;; Compilation
     (let ((compilation-command (cdr (assoc "compile" commands :test 'string=))))
       (when compilation-command
-        (compile-code compilation-command file (and compile-to
-                                                    (normalize-pathname compile-to)))))
+        (setf compile-to
+              (compile-code compilation-command
+                            file
+                            (and compile-to
+                                 (normalize-pathname compile-to))))))
     ;; Execution
     (let ((execution-command (cdr (assoc "execute" commands :test 'string=))))
       (when execution-command
