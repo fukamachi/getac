@@ -22,7 +22,8 @@
     ("go" . (("compile" . ("go" "build" "-o" compile-to file))
              ("execute" . (compile-to))))
     ("java" . (("compile" . ("javac" "-d" compile-in file))
-               ("execute" . ("java" "-cp" compile-in filename))))))
+               ("execute" . ("java" "-cp" compile-in filename))))
+    ("javascript" . (("execute" . ("node" file))))))
 
 (defun render-command (command-template values)
   (mapcar (lambda (x)
@@ -107,6 +108,7 @@
     (cond
       ((string= type "py") "python")
       ((string= type "rb") "ruby")
+      ((string= type "js") "javascript")
       (t type))))
 
 (defun run-file (file input &key compile-to filetype)

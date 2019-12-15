@@ -11,6 +11,7 @@ Unit testing CLI tool for competitive programming.
 * Go
 * Ruby
 * Java
+* Node.js
 
 ## Usage
 
