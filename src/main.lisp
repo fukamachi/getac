@@ -39,10 +39,12 @@
                          (compilation-error (e)
                            (report-compilation-error e)
                            (return-from run nil))))
-           (handler (make-execution-handler file filetype :compile-to compile-to)))
+           (handler (make-execution-handler file filetype :compile-to compile-to))
+           (test-cases (read-from-file testcase-file)))
+      (format t "~&Running ~A test cases...~2%" (length test-cases))
       (loop with passed-count = 0
             for all-test-count from 0
-            for (test-name input expected) in (read-from-file testcase-file)
+            for (test-name input expected) in test-cases
             do (handler-case
                    (multiple-value-bind (result took-ms)
                        (funcall handler input)

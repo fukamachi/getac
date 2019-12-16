@@ -53,7 +53,7 @@
         (format stream "[ ~A ]" label))))
 
 (defun print-first-line (label color &optional test-name took-ms (stream *standard-output*))
-  (fresh-line stream)
+  (format stream "~& ")
   (print-badge label color stream)
   (when test-name
     (format stream " ~A" test-name))
@@ -66,11 +66,11 @@
 
 (defun report-wrong-answer (test-name expected actual took-ms)
   (print-first-line "WA" :red test-name took-ms)
-  (format t "~&  Expected: ~S~%  Actual: ~S~%" expected actual))
+  (format t "~&   Expected: ~S~%   Actual: ~S~%" expected actual))
 
 (defun report-compilation-error (error)
   (print-first-line "CE" :red "Compilation failed.")
-  (format t "~&  ~A~%"
+  (format t "~&   ~A~%"
           (color-text :gray
                       (format nil "While executing ~{~A~^ ~}~2%  ~A"
                               (subprocess-error-command error)
@@ -78,7 +78,7 @@
 
 (defun report-runtime-error (test-name error)
   (print-first-line "RE" :red test-name)
-  (format t "~&  ~A~%"
+  (format t "~&   ~A~%"
           (color-text :gray
                       (format nil "While executing ~{~A~^ ~}~2%  ~A"
                               (subprocess-error-command error)
@@ -86,7 +86,7 @@
 
 (defun report-time-limit-exceeded (test-name seconds)
   (print-first-line "TLE" :red test-name)
-  (format t "~&  ~A~%"
+  (format t "~&   ~A~%"
           (color-text :gray
                       (format nil "Canceled after ~A seconds" seconds))))
 
