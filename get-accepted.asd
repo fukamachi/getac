@@ -2,7 +2,6 @@
   :version "0.1.0"
   :author "Eitaro Fukamachi"
   :license "BSD 3-Clause"
-  :depends-on ("rove")
   :components ((:module "src"
                 :depends-on ("utils")
                 :components
