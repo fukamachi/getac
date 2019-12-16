@@ -28,7 +28,9 @@ OPTIONS:
     -f, --filetype [type]
         File type to test. The default will be detected by the file extension.
     --disable-colors
-        Turn off colors. (Default: false)
+        Turn off colors.
+    -V, --version
+        Print version.
     -h, --help
         Show help.
 
