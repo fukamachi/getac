@@ -10,8 +10,12 @@
            #:subprocess-error-output))
 (in-package #:get-accepted/runner)
 
+(defparameter *cpp-include-locations*
+  (list #+unix "/usr/include/boost"
+        #+darwin "/usr/local/include/boost"))
+
 (defvar *default-commands*
-  '(("lisp" . (("execute" . ("ros" "run" "--" "--script" file))))
+  `(("lisp" . (("execute" . ("ros" "run" "--" "--script" file))))
     ("python" . (("execute" . ("python" "-B" file))))
     ("python2" . (("execute" . ("python2" "-B" file))))
     ("python3" . (("execute" . ("python3" "-B" file))))
@@ -24,7 +28,13 @@
     ("java" . (("compile" . ("javac" "-d" compile-in file))
                ("execute" . ("java" "-cp" compile-in filename))))
     ("javascript" . (("execute" . ("node" file))))
-    ("clojure" . (("execute" . ("clj" file))))))
+    ("clojure" . (("execute" . ("clj" file))))
+    ("c" . (("compile" . ("gcc" "-std=gnu11" "-O2" "-o" compile-to file "-lm"))
+            ("execute" . (compile-to))))
+    ("cpp" . (("compile" . ("g++" "-std=gnu++1y" "-O2" ,@(mapcar (lambda (dir) (format nil "-I~A" dir))
+                                                                 *cpp-include-locations*)
+                            "-o" compile-to file))
+              ("execute" . (compile-to))))))
 
 (defun render-command (command-template values)
   (mapcar (lambda (x)

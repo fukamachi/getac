@@ -6,6 +6,8 @@ Unit testing CLI tool for competitive programming.
 
 ## Supported languages
 
+* C
+* C++
 * Clojure
 * Common Lisp
 * Go
