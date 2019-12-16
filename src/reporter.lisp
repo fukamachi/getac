@@ -18,20 +18,23 @@
     (or (equal (uiop:getenv "EMACS") "t")
         (uiop:getenv "INSIDE_EMACS"))))
 
-(defparameter *color-codes*
+(defparameter *background-color-codes*
   '((:green . 42)
     (:red . 41)
-    (:gray . 90)
-    (:white . 47)
-    (:fggreen . 32)
-    (:fgred . 31)))
+    (:white . 47)))
+
+(defparameter *color-codes*
+  '((:green . 32)
+    (:red . 31)
+    (:gray . 90)))
 
 (defun color-text (color text)
   (if *enable-colors*
       (if (= (length text) 0)
           text
           (let ((code (cdr (assoc color *color-codes*))))
-            (assert code)
+            (unless code
+              (error "Unsupported color: ~A" color))
             (format nil "~C[~Am~A~C[0m"
                     #\Esc
                     code
@@ -42,7 +45,7 @@
 (defun print-badge (label color &optional (stream *standard-output*))
   (check-type label string)
   (check-type stream stream)
-  (let ((code (cdr (assoc color *color-codes*))))
+  (let ((code (cdr (assoc color *background-color-codes*))))
     (unless code
       (error "Unsupported color: ~S" color))
     (if *enable-colors*
@@ -93,10 +96,10 @@
 (defun print-summary (passed-count failed-count)
   (princ
     (if (= failed-count 0)
-        (color-text :fggreen
+        (color-text :green
                     (format nil "~2&✓ All ~D test case~:*~P passed~%"
                             passed-count))
-        (color-text :fgred
+        (color-text :red
                     (format nil "~2&× ~D of ~D test case~:*~P failed~%"
                             failed-count
                             (+ passed-count failed-count))))))
