@@ -69,6 +69,12 @@ Install [Roswell](https://github.com/roswell/roswell) if not already installed.
 $ ros install fukamachi/get-accepted
 ```
 
+## Upgrade
+
+```
+$ ros update get-accepted
+```
+
 After the installation, `get-accepted` command will be installed at `~/.roswell/bin`.
 
 ## Author
