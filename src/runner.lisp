@@ -1,6 +1,8 @@
 (defpackage #:getac/runner
   (:use #:cl
         #:getac/utils)
+  (:import-from #:getac/timer
+                #:with-deadline)
   (:export #:detect-filetype
            #:compile-main-file
            #:make-execution-handler
@@ -145,4 +147,5 @@
     (let ((execution-command (cdr (assoc "execute" commands :test 'string=))))
       (lambda (input)
         (when execution-command
-          (execute-code execution-command file input compile-to))))))
+          (with-deadline
+            (execute-code execution-command file input compile-to)))))))

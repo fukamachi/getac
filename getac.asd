@@ -9,9 +9,10 @@
                  (:module "others"
                   :pathname ""
                   :components
-                  ((:file "runner")
+                  ((:file "runner" :depends-on ("timer"))
                    (:file "testcase")
                    (:file "reporter" :depends-on ("runner"))
+                   (:file "timer")
                    (:file "cli")))))
                (:module "utils"
                 :pathname "src"

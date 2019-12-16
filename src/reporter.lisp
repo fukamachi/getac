@@ -8,6 +8,7 @@
            #:report-wrong-answer
            #:report-runtime-error
            #:report-compilation-error
+           #:report-time-limit-exceeded
            #:report-unknown
            #:print-summary))
 (in-package #:getac/reporter)
@@ -80,6 +81,12 @@
                       (format nil "While executing ~{~A~^ ~}~2%  ~A"
                               (subprocess-error-command error)
                               (subprocess-error-output error)))))
+
+(defun report-time-limit-exceeded (test-name seconds)
+  (print-first-line "TLE" :red test-name)
+  (format t "~&  ~A~%"
+          (color-text :gray
+                      (format nil "Canceled after ~A seconds" seconds))))
 
 (defun report-unknown (test-name)
   (print-first-line "UNKNOWN" :white test-name))

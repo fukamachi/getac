@@ -16,9 +16,15 @@
                 #:report-wrong-answer
                 #:report-compilation-error
                 #:report-runtime-error
+                #:report-time-limit-exceeded
                 #:report-unknown
                 #:print-summary)
+  (:import-from #:getac/timer
+                #:*max-execution-time*
+                #:deadline-timeout
+                #:deadline-timeout-seconds)
   (:export #:*enable-colors*
+           #:*max-execution-time*
            #:run))
 (in-package #:getac)
 
@@ -50,7 +56,9 @@
                         (report-wrong-answer test-name expected result took-ms))))
                  (execution-error (e)
                    (setf passedp nil)
-                   (report-runtime-error test-name e)))
+                   (report-runtime-error test-name e))
+                 (deadline-timeout (e)
+                   (report-time-limit-exceeded test-name (deadline-timeout-seconds e))))
             finally
             (print-summary passed-count (- all-test-count passed-count))))
     passedp))
