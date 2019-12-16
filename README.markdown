@@ -29,7 +29,7 @@ OPTIONS:
         File type to test. The default will be detected by the file extension.
     --disable-colors
         Turn off colors. (Default: false)
-    --h, --help
+    -h, --help
         Show help.
 
 # Run with the default Python

@@ -11,7 +11,8 @@
                   :components
                   ((:file "runner")
                    (:file "testcase")
-                   (:file "reporter" :depends-on ("runner"))))))
+                   (:file "reporter" :depends-on ("runner"))
+                   (:file "cli")))))
                (:module "utils"
                 :pathname "src"
                 :components ((:file "utils"))))

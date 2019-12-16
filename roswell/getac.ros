@@ -8,79 +8,55 @@ exec ros -Q -m getac -L sbcl-bin -- $0 "$@"
   #+quicklisp (ql:quickload '(#:getac) :silent t))
 
 (defpackage #:getac/roswell/getac.ros
-  (:use #:cl))
+  (:use #:cl
+        #:getac/cli))
 (in-package #:getac/roswell/getac.ros)
 
-(defun print-usage ()
+(defun print-usage (&key (quit t))
   (format *error-output*
-          "~&Usage: getac [options] [file]
+          "~&Usage: getac [options] [file]~2%OPTIONS:~%")
+  (print-options-usage *error-output*)
+  (when quit
+    (uiop:quit -1)))
 
-OPTIONS:
-    -t, --test [file]
-        Specify a file to read test cases. (Default: '*.in')
-    -f, --filetype [type]
-        File type to test. The default will be detected by the file extension.
-    --disable-colors
-        Turn off colors. (Default: ~:[true~;false~])
-    --h, --help
-        Show help.~%"
-        getac:*enable-colors*))
+(defoption "test" (:short "t") (file)
+  "Specify a file to read test cases. (Default: '*.in')"
+  (list :test file))
 
-(defvar *test-file* nil)
-(defvar *filetype* nil)
+(defoption "filetype" (:short "f") (type)
+  "File type to test. The default will be detected by the file extension."
+  (list :filetype type))
 
-(defmacro case-equal (keyform &body cases)
-  (let ((g-keyform (gensym "KEYFORM")))
-    `(let ((,g-keyform ,keyform))
-       (cond
-         ,@(loop for (case . body) in cases
-                 if (eq case 'otherwise)
-                   collect `(t ,@body)
-                 else
-                   collect `((find ,g-keyform ',(if (listp case)
-                                                    case
-                                                    (list case))
-                                   :test #'equal)
-                             ,@body))))))
+(defoption "disable-colors" () ()
+  "Turn off colors."
+  (setf getac:*enable-colors* nil)
+  (values))
 
-(defun parse-argv (argv)
-  (loop for option = (pop argv)
-        while option
-        do (case-equal option
-             (("-t" "--test")
-              (setf *test-file* (pop argv)))
-             (("-f" "--filetype")
-              (setf *filetype* (pop argv)))
-             (("--disable-colors")
-              (setf getac:*enable-colors* nil))
-             (("-h" "--help")
-              (print-usage)
-              (uiop:quit -1))
-             (otherwise
-               (if (and (length option)
-                        (char= (aref option 0) #\-))
-                   (progn
-                     (format *error-output* "~&Invalid option: ~A~%" option)
-                     (uiop:quit -1))
-                   (return (cons option argv)))))))
+(defoption "help" (:short "h") ()
+  "Show help."
+  (print-usage :quit t))
 
 (defun main (&rest argv)
-  (let* ((argv (parse-argv argv))
-         (filename (first argv)))
-    (unless filename
-      (print-usage)
-      (uiop:quit -1))
-    (when (rest argv)
-      (format *error-output* "~&Extra arguments: ~{~A~^ ~}~%" (rest argv))
-      (print-usage)
-      (uiop:quit -1))
+  (multiple-value-bind (options argv)
+      (handler-case (parse-argv argv)
+        (cli-error (e)
+          (format *error-output* "~&~A~%" e)
+          (print-usage)
+          (uiop:quit -1)))
+    (let ((filename (pop argv)))
+      (unless filename
+        (format *error-output* "~&Missing a file to text.~%")
+        (print-usage))
+      (when argv
+        (format *error-output* "Extra arguments: ~{~A~^ ~}~%" argv)
+        (print-usage))
 
-    (or (handler-case (getac:run filename :test *test-file* :filetype *filetype*)
-          (simple-error (e)
-            (format *error-output* "~&~A~%" e)
-            nil)
-          (error (e)
-            (format *error-output* "~&~A: ~A~%" (type-of e) e)
-            nil))
-        (uiop:quit -1))))
+      (or (handler-case (apply #'getac:run filename options)
+            (simple-error (e)
+                          (format *error-output* "~&~A~%" e)
+                          nil)
+            (error (e)
+                   (format *error-output* "~&~A: ~A~%" (type-of e) e)
+                   nil))
+          (uiop:quit -1)))))
 ;;; vim: set ft=lisp lisp:
