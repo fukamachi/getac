@@ -48,10 +48,11 @@
         (format stream "~C[30;~Am  ~A  ~C[0m" #\Esc code label #\Esc)
         (format stream "[ ~A ]" label))))
 
-(defun print-first-line (label color test-name &optional took-ms (stream *standard-output*))
+(defun print-first-line (label color &optional test-name took-ms (stream *standard-output*))
   (fresh-line stream)
   (print-badge label color stream)
-  (format stream " ~A" test-name)
+  (when test-name
+    (format stream " ~A" test-name))
   (when took-ms
     (format stream " ~A" (color-text :gray (format nil "(~A ms)" took-ms))))
   (fresh-line stream))
@@ -63,9 +64,9 @@
   (print-first-line "WA" :red test-name took-ms)
   (format t "~&  Expected: ~S~%  Actual: ~S~%" expected actual))
 
-(defun report-compilation-error (test-name error)
+(defun report-compilation-error (error)
   (declare (ignore error))
-  (print-first-line "CE" :red test-name)
+  (print-first-line "CE" :red "Compilation failed.")
   (format t "~&  ~A~%"
           (color-text :gray
                       (format nil "While executing ~{~A~^ ~}~2%  ~A"

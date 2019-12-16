@@ -1,8 +1,9 @@
 (defpackage #:getac/runner
   (:use #:cl
         #:getac/utils)
-  (:export #:*default-commands*
-           #:run-file
+  (:export #:detect-filetype
+           #:compile-main-file
+           #:make-execution-handler
            #:subprocess-error
            #:execution-error
            #:compilation-error
@@ -123,23 +124,25 @@
       ((string= type "clj") "clojure")
       (t type))))
 
-(defun run-file (file input &key compile-to filetype)
-  (let* ((file (normalize-pathname file))
-         (filetype (or filetype
-                       (detect-filetype file)))
-         (commands (cdr (assoc filetype *default-commands* :test 'string=))))
+(defun compile-main-file (file filetype &key compile-to)
+  (check-type file pathname)
+  (let ((commands (cdr (assoc filetype *default-commands* :test 'string=))))
     (unless commands
       (error "Unknown file type: ~A" filetype))
 
-    ;; Compilation
     (let ((compilation-command (cdr (assoc "compile" commands :test 'string=))))
       (when compilation-command
-        (setf compile-to
-              (compile-code compilation-command
-                            file
-                            (and compile-to
-                                 (normalize-pathname compile-to))))))
-    ;; Execution
+        (compile-code compilation-command
+                      file
+                      (and compile-to
+                           (normalize-pathname compile-to)))))))
+
+(defun make-execution-handler (file filetype &key compile-to)
+  (check-type file pathname)
+  (let ((commands (cdr (assoc filetype *default-commands* :test 'string=))))
+    (unless commands
+      (error "Unknown file type: ~A" filetype))
     (let ((execution-command (cdr (assoc "execute" commands :test 'string=))))
-      (when execution-command
-        (execute-code execution-command file input compile-to)))))
+      (lambda (input)
+        (when execution-command
+          (execute-code execution-command file input compile-to))))))

@@ -2,8 +2,9 @@
   (:use #:cl
         #:getac/utils)
   (:import-from #:getac/runner
-                #:*default-commands*
-                #:run-file
+                #:detect-filetype
+                #:compile-main-file
+                #:make-execution-handler
                 #:execution-error
                 #:compilation-error)
   (:import-from #:getac/testcase
@@ -17,36 +18,39 @@
                 #:report-runtime-error
                 #:report-unknown
                 #:print-summary)
-  (:export #:*default-commands*
-           #:*enable-colors*
+  (:export #:*enable-colors*
            #:run))
 (in-package #:getac)
 
 (defun run (file &key test filetype)
   (let* ((file (normalize-pathname file))
+         (filetype (or filetype
+                       (detect-filetype file)))
          (testcase-file (or test
                             (default-testcase-file file)))
          (passedp t))
-    (loop with passed-count = 0
-          for all-test-count from 0
-          for (test-name input expected) in (read-from-file testcase-file)
-          do (handler-case
-               (multiple-value-bind (result took-ms)
-                   (run-file file input :filetype filetype)
-                 (cond
-                   ((not (stringp result))
-                    (report-unknown test-name))
-                   ((equal result expected)
-                    (report-accepted test-name took-ms)
-                    (incf passed-count))
-                   (t
-                    (report-wrong-answer test-name expected result took-ms))))
-               (compilation-error (e)
-                                  (setf passedp nil)
-                                  (report-compilation-error test-name e))
-               (execution-error (e)
-                                (setf passedp nil)
-                                (report-runtime-error test-name e)))
-          finally
-            (print-summary passed-count (- all-test-count passed-count)))
+    (let* ((compile-to (handler-case (compile-main-file file filetype)
+                         (compilation-error (e)
+                           (report-compilation-error e)
+                           (return-from run nil))))
+           (handler (make-execution-handler file filetype :compile-to compile-to)))
+      (loop with passed-count = 0
+            for all-test-count from 0
+            for (test-name input expected) in (read-from-file testcase-file)
+            do (handler-case
+                   (multiple-value-bind (result took-ms)
+                       (funcall handler input)
+                     (cond
+                       ((not (stringp result))
+                        (report-unknown test-name))
+                       ((equal result expected)
+                        (report-accepted test-name took-ms)
+                        (incf passed-count))
+                       (t
+                        (report-wrong-answer test-name expected result took-ms))))
+                 (execution-error (e)
+                   (setf passedp nil)
+                   (report-runtime-error test-name e)))
+            finally
+            (print-summary passed-count (- all-test-count passed-count))))
     passedp))
