@@ -2,7 +2,7 @@
 
 Unit testing CLI tool for competitive programming.
 
-![Screenshot](images/screenshot.png)
+![Screenshot](images/screencast.gif)
 
 ## Supported languages
 
