@@ -16,6 +16,7 @@
   #+sbcl
   `(handler-bind ((sb-sys:deadline-timeout
                     (lambda (e)
+                      (declare (ignore e))
                       (error 'deadline-timeout :seconds *max-execution-time*))))
      (sb-sys:with-deadline (:seconds *max-execution-time*)
        ,@body))

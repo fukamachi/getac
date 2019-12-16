@@ -66,7 +66,6 @@
   (format t "~&  Expected: ~S~%  Actual: ~S~%" expected actual))
 
 (defun report-compilation-error (error)
-  (declare (ignore error))
   (print-first-line "CE" :red "Compilation failed.")
   (format t "~&  ~A~%"
           (color-text :gray
