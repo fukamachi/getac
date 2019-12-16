@@ -46,9 +46,9 @@ $ getac -f pypy3 main.py
 
 ## Getting started
 
-1. Write your code in a file like "main.lisp"
-2. Write your test cases in "*.in" like "main.in"
-3. Run `getac main.lisp`
+1. Write your code in a file (ex. `main.py`)
+2. Write your test cases in "*.in" (ex. `main.in`)
+3. Run `getac main.py`
 
 ## Usage
 
@@ -73,13 +73,13 @@ Install [Roswell](https://github.com/roswell/roswell) if not already installed.
 $ ros install fukamachi/getac
 ```
 
+After the installation, `getac` command will be installed at `~/.roswell/bin`.
+
 ## Upgrade
 
 ```
 $ ros update getac
 ```
-
-After the installation, `getac` command will be installed at `~/.roswell/bin`.
 
 ## Author
 
