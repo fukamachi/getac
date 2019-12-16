@@ -13,12 +13,13 @@
                               (char/= x #\=))
                             line)))
     (and start
+         (<= 2 start)
          (let ((end (position-if (lambda (x)
                                    (char= x #\=))
                                  line
                                  :start start)))
            (and end
-                (= start (- (length line) end))
+                (<= 2 (- (length line) end))
                 (not (find-if (lambda (x) (char/= x #\=)) line :start end))
                 (values t (string-trim '(#\Space #\Tab) (subseq line start end))))))))
 
