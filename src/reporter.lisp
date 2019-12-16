@@ -1,6 +1,6 @@
-(defpackage #:get-accepted/reporter
+(defpackage #:getac/reporter
   (:use #:cl)
-  (:import-from #:get-accepted/runner
+  (:import-from #:getac/runner
                 #:subprocess-error-command
                 #:subprocess-error-output)
   (:export #:*enable-colors*
@@ -10,7 +10,7 @@
            #:report-compilation-error
            #:report-unknown
            #:print-summary))
-(in-package #:get-accepted/reporter)
+(in-package #:getac/reporter)
 
 (defvar *enable-colors*
   (not

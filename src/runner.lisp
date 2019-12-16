@@ -1,6 +1,6 @@
-(defpackage #:get-accepted/runner
+(defpackage #:getac/runner
   (:use #:cl
-        #:get-accepted/utils)
+        #:getac/utils)
   (:export #:*default-commands*
            #:run-file
            #:subprocess-error
@@ -8,7 +8,7 @@
            #:compilation-error
            #:subprocess-error-command
            #:subprocess-error-output))
-(in-package #:get-accepted/runner)
+(in-package #:getac/runner)
 
 (defparameter *cpp-include-locations*
   (list #+unix "/usr/include/boost"

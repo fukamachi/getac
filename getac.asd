@@ -1,4 +1,4 @@
-(defsystem "get-accepted"
+(defsystem "getac"
   :version "0.1.0"
   :author "Eitaro Fukamachi"
   :license "BSD 3-Clause"
@@ -15,5 +15,4 @@
                (:module "utils"
                 :pathname "src"
                 :components ((:file "utils"))))
-  :description "Unit testing CLI tool for competitive programming"
-  :in-order-to ((test-op (test-op "get-accepted/tests"))))
+  :description "Unit testing CLI tool for competitive programming")

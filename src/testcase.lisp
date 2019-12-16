@@ -1,10 +1,10 @@
-(defpackage #:get-accepted/testcase
+(defpackage #:getac/testcase
   (:use #:cl
-        #:get-accepted/utils)
+        #:getac/utils)
   (:export #:read-from-stream
            #:read-from-file
            #:default-testcase-file))
-(in-package #:get-accepted/testcase)
+(in-package #:getac/testcase)
 
 (defparameter *testcase-file-extension* "in")
 

@@ -1,7 +1,7 @@
-(defpackage #:get-accepted/utils
+(defpackage #:getac/utils
   (:use #:cl)
   (:export #:normalize-pathname))
-(in-package #:get-accepted/utils)
+(in-package #:getac/utils)
 
 (defun normalize-pathname (filename)
   (let ((file (probe-file filename)))

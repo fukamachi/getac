@@ -1,19 +1,19 @@
 #!/bin/sh
 #|-*- mode:lisp -*-|#
 #|
-exec ros -Q -m get-accepted -L sbcl-bin -- $0 "$@"
+exec ros -Q -m getac -L sbcl-bin -- $0 "$@"
 |#
 (progn ;;init forms
   (ros:ensure-asdf)
-  #+quicklisp (ql:quickload '(#:get-accepted) :silent t))
+  #+quicklisp (ql:quickload '(#:getac) :silent t))
 
-(defpackage #:get-accepted/roswell/get-accepted.ros
+(defpackage #:getac/roswell/getac.ros
   (:use #:cl))
-(in-package #:get-accepted/roswell/get-accepted.ros)
+(in-package #:getac/roswell/getac.ros)
 
 (defun print-usage ()
   (format *error-output*
-          "~&Usage: get-accepted [options] [file]
+          "~&Usage: getac [options] [file]
 
 OPTIONS:
     -t, --test [file]
@@ -24,7 +24,7 @@ OPTIONS:
         Turn off colors. (Default: ~:[true~;false~])
     --h, --help
         Show help.~%"
-        get-accepted:*enable-colors*))
+        getac:*enable-colors*))
 
 (defvar *test-file* nil)
 (defvar *filetype* nil)
@@ -52,7 +52,7 @@ OPTIONS:
              (("-f" "--filetype")
               (setf *filetype* (pop argv)))
              (("--disable-colors")
-              (setf get-accepted:*enable-colors* nil))
+              (setf getac:*enable-colors* nil))
              (("-h" "--help")
               (print-usage)
               (uiop:quit -1))
@@ -75,7 +75,7 @@ OPTIONS:
       (print-usage)
       (uiop:quit -1))
 
-    (or (handler-case (get-accepted:run filename :test *test-file* :filetype *filetype*)
+    (or (handler-case (getac:run filename :test *test-file* :filetype *filetype*)
           (simple-error (e)
             (format *error-output* "~&~A~%" e)
             nil)

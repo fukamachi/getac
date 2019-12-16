@@ -1,15 +1,15 @@
-(defpackage #:get-accepted
+(defpackage #:getac
   (:use #:cl
-        #:get-accepted/utils)
-  (:import-from #:get-accepted/runner
+        #:getac/utils)
+  (:import-from #:getac/runner
                 #:*default-commands*
                 #:run-file
                 #:execution-error
                 #:compilation-error)
-  (:import-from #:get-accepted/testcase
+  (:import-from #:getac/testcase
                 #:read-from-file
                 #:default-testcase-file)
-  (:import-from #:get-accepted/reporter
+  (:import-from #:getac/reporter
                 #:*enable-colors*
                 #:report-accepted
                 #:report-wrong-answer
@@ -20,7 +20,7 @@
   (:export #:*default-commands*
            #:*enable-colors*
            #:run))
-(in-package #:get-accepted)
+(in-package #:getac)
 
 (defun run (file &key test filetype)
   (let* ((file (normalize-pathname file))

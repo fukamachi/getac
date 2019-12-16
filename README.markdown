@@ -1,4 +1,4 @@
-# get-accepted
+# getac
 
 Unit testing CLI tool for competitive programming.
 
@@ -19,8 +19,8 @@ Unit testing CLI tool for competitive programming.
 ## Usage
 
 ```
-$ get-accepted -h
-Usage: get-accepted [options] [file]
+$ getac -h
+Usage: getac [options] [file]
 
 OPTIONS:
     -t, --test [file]
@@ -33,20 +33,20 @@ OPTIONS:
         Show help.
 
 # Run with the default Python
-$ get-accepted main.py
+$ getac main.py
 
 # Specify test cases
-$ get-accepted -t test-cases.in main.py
+$ getac -t test-cases.in main.py
 
 # Run with PyPy3
-$ get-accepted -f pypy3 main.py
+$ getac -f pypy3 main.py
 ```
 
 ## Getting started
 
 1. Write your code in a file like "main.lisp"
 2. Write your test cases in "*.in" like "main.in"
-3. Run `get-accepted main.lisp`
+3. Run `getac main.lisp`
 
 ## Usage
 
@@ -68,16 +68,16 @@ Expected result is here again...
 Install [Roswell](https://github.com/roswell/roswell) if not already installed.
 
 ```
-$ ros install fukamachi/get-accepted
+$ ros install fukamachi/getac
 ```
 
 ## Upgrade
 
 ```
-$ ros update get-accepted
+$ ros update getac
 ```
 
-After the installation, `get-accepted` command will be installed at `~/.roswell/bin`.
+After the installation, `getac` command will be installed at `~/.roswell/bin`.
 
 ## Author
 
