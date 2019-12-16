@@ -84,15 +84,16 @@
         (took-ms 0))
     (with-input-from-string (in input)
       (values
-        (handler-case (with-took-ms took-ms
-                        (uiop:run-program command
-                                          :input in
-                                          :output :string
-                                          :error-output errout))
-          (uiop:subprocess-error ()
-            (error 'execution-error
-                   :command command
-                   :output (get-output-stream-string errout))))
+        (with-output-to-string (s)
+          (handler-case (with-took-ms took-ms
+                          (uiop:run-program command
+                                            :input in
+                                            :output s
+                                            :error-output errout))
+            (uiop:subprocess-error ()
+              (error 'execution-error
+                     :command command
+                     :output (get-output-stream-string errout)))))
         took-ms))))
 
 (defun compile-code (command-template file &optional compile-to)
