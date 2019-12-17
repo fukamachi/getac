@@ -50,17 +50,17 @@
                        (funcall handler input)
                      (cond
                        ((not (stringp result))
-                        (report-unknown test-name))
+                        (report-unknown test-name input))
                        ((equal result expected)
                         (report-accepted test-name took-ms)
                         (incf passed-count))
                        (t
-                        (report-wrong-answer test-name expected result took-ms))))
+                        (report-wrong-answer test-name input expected result took-ms))))
                  (execution-error (e)
                    (setf passedp nil)
-                   (report-runtime-error test-name e))
+                   (report-runtime-error test-name input e))
                  (deadline-timeout (e)
-                   (report-time-limit-exceeded test-name (deadline-timeout-seconds e))))
+                   (report-time-limit-exceeded test-name input (deadline-timeout-seconds e))))
             finally
             (print-summary passed-count (- all-test-count passed-count))))
     passedp))

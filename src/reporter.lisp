@@ -113,8 +113,14 @@
                   (color-text :gray "[no newline at the end]")))))
     (format t "~2&")))
 
-(defun report-wrong-answer (test-name expected actual took-ms)
+(defun %print-input (input)
+  (format t "~2&")
+  (let ((stream (make-indent-stream *standard-output* :level 3)))
+    (princ input stream)))
+
+(defun report-wrong-answer (test-name input expected actual took-ms)
   (print-first-line "WA" :red test-name took-ms)
+  (%print-input input)
   (format t "~2&   ~A ~A~2%"
           (color-text :red "- actual")
           (color-text :green "+ expected"))
@@ -130,24 +136,27 @@
                                   (subprocess-error-command error)
                                   (subprocess-error-output error)))))))
 
-(defun report-runtime-error (test-name error)
+(defun report-runtime-error (test-name input error)
   (print-first-line "RE" :red test-name)
+  (%print-input input)
   (let ((stream (make-indent-stream *standard-output*)))
     (with-indent (stream +3)
-      (format stream "~&~A~%"
+      (format stream "~2&~A~%"
               (color-text :gray
                           (format nil "While executing ~{~A~^ ~}~2%  ~A"
                                   (subprocess-error-command error)
                                   (subprocess-error-output error)))))))
 
-(defun report-time-limit-exceeded (test-name seconds)
+(defun report-time-limit-exceeded (test-name input seconds)
   (print-first-line "TLE" :red test-name)
-  (format t "~&   ~A~%"
+  (%print-input input)
+  (format t "~2&   ~A~%"
           (color-text :gray
                       (format nil "Canceled after ~A seconds" seconds))))
 
-(defun report-unknown (test-name)
-  (print-first-line "UNKNOWN" :white test-name))
+(defun report-unknown (test-name input)
+  (print-first-line "UNKNOWN" :white test-name)
+  (%print-input input))
 
 (defun print-summary (passed-count failed-count)
   (princ
