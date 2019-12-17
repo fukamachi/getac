@@ -14,7 +14,7 @@ exec ros -Q -m getac -L sbcl-bin -- $0 "$@"
 
 (defun print-usage (&key (quit t))
   (format *error-output*
-          "~&Usage: getac [options] [file]~2%OPTIONS:~%")
+          "~&Usage: getac [options] <file>~2%OPTIONS:~%")
   (print-options-usage *error-output*)
   (when quit
     (uiop:quit -1)))

@@ -63,7 +63,7 @@
     option))
 
 (defun print-usage-of-option (option stream)
-  (format stream "~&    ~@[-~A, ~]--~A~@[ ~{[~(~A~)]~^ ~}~]~%~@[        ~A~%~]"
+  (format stream "~&    ~@[-~A, ~]--~A~@[=~{<~(~A~)>~^ ~}~]~%~@[        ~A~%~]"
           (option-short option)
           (option-name option)
           (option-lambda-list option)

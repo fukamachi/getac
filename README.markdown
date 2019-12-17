@@ -20,12 +20,12 @@ Unit testing CLI tool for competitive programming.
 
 ```
 $ getac -h
-Usage: getac [options] [file]
+Usage: getac [options] <file>
 
 OPTIONS:
-    -t, --test [file]
+    -t, --test=<file>
         Specify a file to read test cases. (Default: '*.in')
-    -f, --filetype [type]
+    -f, --filetype=<type>
         File type to test. The default will be detected by the file extension.
     --disable-colors
         Turn off colors.
