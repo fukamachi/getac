@@ -1,20 +1,8 @@
 # getac
 
-Unit testing CLI tool for competitive programming.
+Quick unit testing CLI tool for competitive programming.
 
 ![Screenshot](images/screencast.gif)
-
-## Supported languages
-
-* C
-* C++
-* Clojure
-* Common Lisp
-* Go
-* Java
-* Node.js
-* Python
-* Ruby
 
 ## Usage
 
@@ -46,27 +34,6 @@ $ getac -t test-cases.in main.py
 $ getac -f pypy3 main.py
 ```
 
-## Getting started
-
-1. Write your code in a file (ex. `main.py`)
-2. Write your test cases in "*.in" (ex. `main.in`)
-3. Run `getac main.py`
-
-## Usage
-
-### Format of test cases
-
-```
-==== example1 ====
-Input texts are here...
-------------------
-Expected result is here...
-==== example2 ====
-Second test case
-------------------
-Expected result is here again...
-```
-
 ## Installation
 
 Install [Roswell](https://github.com/roswell/roswell) if not already installed.
@@ -82,6 +49,95 @@ After the installation, `getac` command will be installed at `~/.roswell/bin`.
 ```
 $ ros update getac
 ```
+
+## Getting started
+
+1. Write your code in a file (ex. `main.py`)
+
+```python
+a = int(input())
+b, c = map(int, input().split())
+s = input()
+print(a + b + c, s)
+```
+
+2. Write your test cases in "*.in" (ex. `main.in`)
+
+```
+==== example1 ====
+1
+2 3
+test
+--------------
+6 test
+==== example2 ====
+2
+3 4
+myonmyon
+-------
+9 myonmyon
+```
+
+See [Format of test cases](#format-of-test-cases) for getting its syntax.
+
+3. Run `getac main.py`
+
+![Screenshot of successed tests](images/screenshot-1.png)
+
+If some test cases are failed, it shows 'WA' (wrong answer).
+
+![Screenshot of failed tests](images/screenshot-2.png)
+
+## Format of test cases
+
+Let's start with this very minimal example which contains a single test case:
+
+```
+Input texts are here...
+------------------
+Expected result is here...
+```
+
+The input text and its expected results are separated with `----` (more than 4 hyphens).
+
+When you include multiple test cases in the same file, those have to be divided with `====` (more than 4 equal signs).
+
+```
+Input texts are here...
+------------------
+Expected result is here...
+==================
+Second test case
+------------------
+Expected result is here again...
+```
+
+The name of each test cases can be written in the middle of separators, like `==== example1 ====`.
+
+Here's the full example:
+
+```
+==== example1 ====
+Input texts are here...
+------------------
+Expected result is here...
+==== example2 ====
+Second test case
+------------------
+Expected result is here again...
+```
+
+## Supported languages
+
+* C
+* C++
+* Clojure
+* Common Lisp
+* Go
+* Java
+* Node.js
+* Python
+* Ruby
 
 ## Author
 
