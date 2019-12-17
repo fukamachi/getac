@@ -5,6 +5,10 @@
                 #:subprocess-error-output)
   (:import-from #:getac/diff
                 #:lcs)
+  (:import-from #:getac/indent-stream
+                #:make-indent-stream
+                #:stream-fresh-line-p
+                #:with-indent)
   (:export #:*enable-colors*
            #:report-accepted
            #:report-wrong-answer
@@ -68,29 +72,46 @@
 
 (defun diff (a b)
   (let ((lcs (lcs a b)))
-    (format t "~&   ~A " (color-text :red "-"))
-    (loop with (lcs-char . lcs-rest) = lcs
-          for i from 0
-          for ch across b
-          if (null lcs-char)
-          do (princ (color-text :red (princ-to-string ch)))
-          else if (char= ch lcs-char)
-          do (princ ch)
-             (setf lcs-char (pop lcs-rest))
-          else
-          do (princ (color-text :red (princ-to-string ch))))
-    (format t "~&   ~A " (color-text :green "+"))
-    (loop with (lcs-char . lcs-rest) = lcs
-          for i from 0
-          for ch across a
-          if (null lcs-char)
-          do (princ (color-text :green (princ-to-string ch)))
-          else if (char= ch lcs-char)
-          do (princ ch)
-             (setf lcs-char (pop lcs-rest))
-          else
-          do (princ (color-text :green (princ-to-string ch))))
-    (format t "~&")))
+    (let ((stream (make-indent-stream *standard-output*
+                                      :prefix (color-text :red "- "))))
+      (with-indent (stream +3)
+        (loop with (lcs-char . lcs-rest) = lcs
+              for i from 0
+              for ch across b
+              if (null lcs-char)
+              do (princ (if (graphic-char-p ch)
+                            (color-text :red (princ-to-string ch))
+                            ch)
+                        stream)
+              else if (char= ch lcs-char)
+              do (princ ch stream)
+                 (setf lcs-char (pop lcs-rest))
+              else
+              do (princ (color-text :red (princ-to-string ch)) stream))
+        (unless (stream-fresh-line-p stream)
+          (format stream "~&~A~%"
+                  (color-text :gray "[no newline at the end]")))))
+    (format t "~&")
+    (let ((stream (make-indent-stream *standard-output*
+                                      :prefix (color-text :green "+ "))))
+      (with-indent (stream +3)
+        (loop with (lcs-char . lcs-rest) = lcs
+              for i from 0
+              for ch across a
+              if (null lcs-char)
+              do (princ (if (graphic-char-p ch)
+                            (color-text :green (princ-to-string ch))
+                            ch)
+                        stream)
+              else if (char= ch lcs-char)
+              do (princ ch stream)
+                 (setf lcs-char (pop lcs-rest))
+              else
+              do (princ (color-text :green (princ-to-string ch)) stream))
+        (unless (stream-fresh-line-p stream)
+          (format stream "~&~A~%"
+                  (color-text :gray "[no newline at the end]")))))
+    (format t "~2&")))
 
 (defun report-wrong-answer (test-name expected actual took-ms)
   (print-first-line "WA" :red test-name took-ms)
@@ -128,9 +149,9 @@
   (princ
     (if (= failed-count 0)
         (color-text :green
-                    (format nil "~2&✓ All ~D test case~:*~P passed~%"
+                    (format nil "~&✓ All ~D test case~:*~P passed~%"
                             passed-count))
         (color-text :red
-                    (format nil "~2&× ~D of ~D test case~:*~P failed~%"
+                    (format nil "~&× ~D of ~D test case~:*~P failed~%"
                             failed-count
                             (+ passed-count failed-count))))))
