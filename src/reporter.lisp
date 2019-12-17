@@ -3,6 +3,8 @@
   (:import-from #:getac/runner
                 #:subprocess-error-command
                 #:subprocess-error-output)
+  (:import-from #:getac/diff
+                #:lcs)
   (:export #:*enable-colors*
            #:report-accepted
            #:report-wrong-answer
@@ -64,9 +66,38 @@
 (defun report-accepted (test-name took-ms)
   (print-first-line "AC" :green test-name took-ms))
 
+(defun diff (a b)
+  (let ((lcs (lcs a b)))
+    (format t "~&   ~A " (color-text :red "-"))
+    (loop with (lcs-char . lcs-rest) = lcs
+          for i from 0
+          for ch across b
+          if (null lcs-char)
+          do (princ (color-text :red (princ-to-string ch)))
+          else if (char= ch lcs-char)
+          do (princ ch)
+             (setf lcs-char (pop lcs-rest))
+          else
+          do (princ (color-text :red (princ-to-string ch))))
+    (format t "~&   ~A " (color-text :green "+"))
+    (loop with (lcs-char . lcs-rest) = lcs
+          for i from 0
+          for ch across a
+          if (null lcs-char)
+          do (princ (color-text :green (princ-to-string ch)))
+          else if (char= ch lcs-char)
+          do (princ ch)
+             (setf lcs-char (pop lcs-rest))
+          else
+          do (princ (color-text :green (princ-to-string ch))))
+    (format t "~&")))
+
 (defun report-wrong-answer (test-name expected actual took-ms)
   (print-first-line "WA" :red test-name took-ms)
-  (format t "~&   Expected: ~S~%   Actual: ~S~%" expected actual))
+  (format t "~2&   ~A ~A~2%"
+          (color-text :red "- actual")
+          (color-text :green "+ expected"))
+  (diff expected actual))
 
 (defun report-compilation-error (error)
   (print-first-line "CE" :red "Compilation failed.")

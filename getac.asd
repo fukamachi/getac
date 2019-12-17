@@ -11,9 +11,10 @@
                   :components
                   ((:file "runner" :depends-on ("timer"))
                    (:file "testcase")
-                   (:file "reporter" :depends-on ("runner"))
+                   (:file "reporter" :depends-on ("runner" "diff"))
                    (:file "timer")
-                   (:file "cli")))))
+                   (:file "cli")
+                   (:file "diff")))))
                (:module "utils"
                 :pathname "src"
                 :components ((:file "utils"))))
