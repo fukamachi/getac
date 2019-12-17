@@ -153,7 +153,7 @@
   (princ
     (if (= failed-count 0)
         (color-text :green
-                    (format nil "~&✓ All ~D test case~:*~P passed~%"
+                    (format nil "~2&✓ All ~D test case~:*~P passed~%"
                             passed-count))
         (color-text :red
                     (format nil "~&× ~D of ~D test case~:*~P failed~%"
