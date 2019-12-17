@@ -20,7 +20,7 @@ exec ros -Q -m getac -L sbcl-bin -- $0 "$@"
     (uiop:quit -1)))
 
 (defoption "test" (:short "t") (file)
-  "Specify a file to read test cases. (Default: '*.in')"
+  "Specify a file to read test cases. (Default: <file>.txt)"
   (list :test file))
 
 (defoption "filetype" (:short "f") (type)

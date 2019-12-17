@@ -12,7 +12,7 @@ Usage: getac [options] <file>
 
 OPTIONS:
     -t, --test=<file>
-        Specify a file to read test cases. (Default: '*.in')
+        Specify a file to read test cases. (Default: <file>.txt)
     -f, --filetype=<type>
         File type to test. The default will be detected by the file extension.
     --disable-colors
@@ -61,7 +61,7 @@ s = input()
 print(a + b + c, s)
 ```
 
-2. Write your test cases in "*.in" (ex. `main.in`)
+2. Write your test cases in "*.txt" (ex. `main.txt`)
 
 ```
 ==== example1 ====

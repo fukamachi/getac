@@ -6,7 +6,7 @@
            #:default-testcase-file))
 (in-package #:getac/testcase)
 
-(defparameter *testcase-file-extension* "in")
+(defparameter *testcase-file-extension* "txt")
 
 (defun header-line-p (line)
   (let ((start (position-if (lambda (x)
