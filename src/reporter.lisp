@@ -15,7 +15,6 @@
            #:report-runtime-error
            #:report-compilation-error
            #:report-time-limit-exceeded
-           #:report-unknown
            #:print-summary))
 (in-package #:getac/reporter)
 
@@ -32,6 +31,7 @@
 (defparameter *color-codes*
   '((:green . 32)
     (:red . 31)
+    (:aqua . 36)
     (:gray . 90)))
 
 (defun color-text (color text)
@@ -154,11 +154,7 @@
           (color-text :gray
                       (format nil "Canceled after ~A seconds" seconds))))
 
-(defun report-unknown (test-name input)
-  (print-first-line "UNKNOWN" :white test-name)
-  (%print-input input))
-
-(defun print-summary (passed-count failed-count)
+(defun print-summary (passed-count failed-count skipped-count)
   (princ
     (if (= failed-count 0)
         (color-text :green
@@ -167,4 +163,7 @@
         (color-text :red
                     (format nil "~&× ~D of ~D test case~:*~P failed~%"
                             failed-count
-                            (+ passed-count failed-count))))))
+                            (+ passed-count failed-count)))))
+  (unless (= skipped-count 0)
+    (princ (color-text :aqua
+                       (format nil "● ~D test case~:*~P skipped~%" skipped-count)))))

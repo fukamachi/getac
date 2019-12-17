@@ -29,6 +29,8 @@ OPTIONS:
         File type to test. The default will be detected by the file extension.
     --disable-colors
         Turn off colors.
+    -F, --no-fail-fast
+        Don't quit when a failure.
     -V, --version
         Print version.
     -h, --help

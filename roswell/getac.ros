@@ -32,6 +32,10 @@ exec ros -Q -m getac -L sbcl-bin -- $0 "$@"
   (setf getac:*enable-colors* nil)
   (values))
 
+(defoption "no-fail-fast" (:short "F") ()
+  "Don't quit when a failure."
+  (list :fail-fast nil))
+
 (defoption "version" (:short "V") ()
   "Print version."
   (format *error-output* "~&v~A~%" (asdf:component-version (asdf:find-system '#:getac)))
