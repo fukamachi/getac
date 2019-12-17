@@ -99,4 +99,5 @@
                      (apply (option-handler option)
                             (and value (list value)))))) into results
         else
-        do (return (values results (cons arg argv)))))
+        do (return (values results (cons arg argv)))
+        finally (return (values results nil))))
