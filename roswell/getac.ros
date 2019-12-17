@@ -56,8 +56,13 @@ exec ros -Q -m getac -L sbcl-bin -- $0 "$@"
             (format *error-output* "~&Missing a file to text.~%")
             (print-usage))
           (when argv
-            (format *error-output* "Extra arguments: ~{~A~^ ~}~%" argv)
-            (print-usage))
+            ;; Allow options after the filename
+            (multiple-value-bind (more-options argv)
+                (parse-argv argv)
+              (when argv
+                (format *error-output* "Extra arguments: ~{~A~^ ~}~%" argv)
+                (print-usage))
+              (setf options (append options more-options))))
 
           (or (handler-case (apply #'getac:run filename options)
                 (simple-error (e)
