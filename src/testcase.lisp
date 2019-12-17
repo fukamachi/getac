@@ -12,36 +12,41 @@
   (let ((start (position-if (lambda (x)
                               (char/= x #\=))
                             line)))
-    (and start
-         (<= 2 start)
-         (let ((end (position-if (lambda (x)
-                                   (char= x #\=))
-                                 line
-                                 :start start)))
-           (and end
-                (<= 2 (- (length line) end))
-                (not (find-if (lambda (x) (char/= x #\=)) line :start end))
-                (values t (string-trim '(#\Space #\Tab) (subseq line start end))))))))
+    (or (and (null start)
+             (<= 4 (length line))
+             (values t nil))
+        (and (<= 2 start)
+             (let ((end (position-if (lambda (x)
+                                       (char= x #\=))
+                                     line
+                                     :start start)))
+               (and end
+                    (<= 2 (- (length line) end))
+                    (not (find-if (lambda (x) (char/= x #\=)) line :start end))
+                    (values t (string-trim '(#\Space #\Tab) (subseq line start end)))))))))
 
 (defun delimiter-line-p (line)
   (and (<= 4 (length line))
        (every (lambda (x) (char= x #\-)) line)))
 
+(defparameter *default-test-name* "test case ~D")
+
 (defun read-from-stream (stream)
   (let ((eof nil)
         (results '())
-        (header-line (read-line stream nil nil)))
+        (header-line (read-line stream nil nil))
+        (gen-test-count 0))
     (loop
       (when eof
         (return))
-      (unless header-line
-        (error "Unexpected EOF while reading a test case header"))
       (multiple-value-bind (headerp test-name)
           (header-line-p header-line)
-        (unless headerp
-          (error "Not test case header: ~S" header-line))
-        (let ((input
+        (let ((test-name (or test-name
+                             (format nil *default-test-name* (incf gen-test-count))))
+              (input
                 (let ((buffer (make-string-output-stream)))
+                  (unless headerp
+                    (format buffer "~A~%" header-line))
                   (loop
                     (let ((line (read-line stream nil nil)))
                       (cond
