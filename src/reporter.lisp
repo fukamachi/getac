@@ -129,7 +129,7 @@
                   (not (new-line-char-p (aref a (1- (length a))))))
           (format stream "~&~A~%"
                   (color-text :gray "[no newline at the end]")))))
-    (format t "~2&")))
+    (format t "~&")))
 
 (defun %print-input (input)
   (format t "~2&")
@@ -179,7 +179,7 @@
                     (format nil "~2&✓ All ~D test case~:*~P passed~%"
                             passed-count))
         (color-text :red
-                    (format nil "~&× ~D of ~D test case~:*~P failed~%"
+                    (format nil "~2&× ~D of ~D test case~:*~P failed~%"
                             failed-count
                             (+ passed-count failed-count)))))
   (unless (= skipped-count 0)

@@ -56,7 +56,8 @@
                            (report-wrong-answer test-name input expected result took-ms)
                            (incf failed-count)
                            (when fail-fast
-                             (return)))))
+                             (return))
+                           (write-char #\Newline))))
                  (execution-error (e)
                    (report-runtime-error test-name input e)
                    (incf failed-count)
