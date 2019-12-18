@@ -93,7 +93,8 @@
             (uiop:subprocess-error ()
               (error 'execution-error
                      :command command
-                     :output (get-output-stream-string errout)))))
+                     :output (get-output-stream-string errout))))
+          (format *error-output* (get-output-stream-string errout)))
         took-ms))))
 
 (defun compile-code (command-template file &optional compile-to)
