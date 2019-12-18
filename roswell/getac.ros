@@ -57,7 +57,7 @@ exec ros -Q -m getac -L sbcl-bin -- $0 "$@"
               (uiop:quit -1)))
         (let ((filename (pop argv)))
           (unless filename
-            (format *error-output* "~&Missing a file to text.~%")
+            (format *error-output* "~&Missing a file to test.~%")
             (print-usage))
           (when argv
             ;; Allow options after the filename
