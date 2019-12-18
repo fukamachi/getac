@@ -1,5 +1,7 @@
 (defpackage #:getac/cli
   (:use #:cl)
+  (:import-from #:getac
+                #:run)
   (:export #:option
            #:defoption
            #:option-name
@@ -9,7 +11,9 @@
            #:invalid-option
            #:missing-option-value
            #:print-options-usage
-           #:parse-argv))
+           #:parse-argv
+           #:cli-main
+           #:main))
 (in-package #:getac/cli)
 
 (define-condition cli-error (error) ())
@@ -101,3 +105,83 @@
         else
         do (return (values results (cons arg argv)))
         finally (return (values results nil))))
+
+(defun print-usage (&key (quit t))
+  (format *error-output*
+          "~&Usage: getac [options] <file>~2%OPTIONS:~%")
+  (print-options-usage *error-output*)
+  (when quit
+    (uiop:quit -1)))
+
+(defoption "test" (:short "t") (file)
+  "Specify a file to read test cases. (Default: <file>.txt)"
+  (list :test file))
+
+(defoption "filetype" (:short "f") (type)
+  "File type to test. The default will be detected by the file extension."
+  (list :filetype type))
+
+(defoption "timeout" (:short "T") (seconds)
+  #.(format nil "Time limit for each test cases. (Default: ~A)" getac:*default-timeout*)
+  (let ((sec (handler-case (read-from-string seconds)
+               (error ()
+                 (error "Invalid value for timeout: ~A" seconds)))))
+    (unless (numberp sec)
+      (error "Invalid value for timeout: ~A" seconds))
+    (list :timeout sec)))
+
+(defoption "disable-colors" () ()
+  "Turn off colors."
+  (setf getac:*enable-colors* nil)
+  (values))
+
+(defoption "no-fail-fast" (:short "F") ()
+  "Don't quit when a failure."
+  (list :fail-fast nil))
+
+(defoption "version" (:short "V") ()
+  "Print version."
+  (format *error-output* "~&v~A~%" (asdf:component-version (asdf:find-system '#:getac)))
+  (uiop:quit -1))
+
+(defoption "help" (:short "h") ()
+  "Show help."
+  (print-usage :quit t))
+
+(defun cli-main (&rest argv)
+  (unless argv
+    (print-usage))
+  (handler-case
+      (multiple-value-bind (options argv)
+          (handler-case (parse-argv argv)
+            (cli-error (e)
+              (format *error-output* "~&~A~%" e)
+              (print-usage)
+              (uiop:quit -1)))
+        (let ((filename (pop argv)))
+          (unless filename
+            (format *error-output* "~&Missing a file to test.~%")
+            (print-usage))
+          (when argv
+            ;; Allow options after the filename
+            (multiple-value-bind (more-options argv)
+                (parse-argv argv)
+              (when argv
+                (format *error-output* "Extra arguments: ~{~A~^ ~}~%" argv)
+                (print-usage))
+              (setf options (append options more-options))))
+
+          (or (handler-case (apply #'getac:run filename options)
+                (simple-error (e)
+                              (format *error-output* "~&~A~%" e)
+                              nil)
+                (error (e)
+                       (format *error-output* "~&~A: ~A~%" (type-of e) e)
+                       nil))
+              (uiop:quit -1))))
+   #+sbcl (sb-sys:interactive-interrupt () (uiop:quit -1 t))))
+
+(defun main ()
+  (let ((argv #+sbcl (rest sb-ext:*posix-argv*)
+              #-sbcl uiop:*command-line-arguments*))
+    (apply #'cli-main argv)))

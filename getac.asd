@@ -7,6 +7,7 @@
                 :depends-on ("utils")
                 :components
                 ((:file "main" :depends-on ("others"))
+                 (:file "cli" :depends-on ("main"))
                  (:module "others"
                   :pathname ""
                   :components
@@ -14,7 +15,6 @@
                    (:file "testcase")
                    (:file "reporter" :depends-on ("runner" "diff" "indent-stream"))
                    (:file "timer")
-                   (:file "cli")
                    (:file "diff")
                    (:file "indent-stream")))))
                (:module "utils"
