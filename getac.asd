@@ -1,5 +1,5 @@
 (defsystem "getac"
-  :version "0.1.0"
+  :version "0.1.1"
   :author "Eitaro Fukamachi"
   :license "BSD 3-Clause"
   :depends-on ("trivial-gray-streams")
