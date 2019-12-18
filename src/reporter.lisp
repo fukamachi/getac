@@ -4,10 +4,11 @@
                 #:subprocess-error-command
                 #:subprocess-error-output)
   (:import-from #:getac/diff
-                #:lcs)
+                #:edit-operations)
   (:import-from #:getac/indent-stream
                 #:make-indent-stream
                 #:stream-fresh-line-p
+                #:new-line-char-p
                 #:with-indent)
   (:export #:*enable-colors*
            #:report-accepted
@@ -34,18 +35,23 @@
     (:aqua . 36)
     (:gray . 90)))
 
+(defun start-color (color &optional stream)
+  (let ((code (cdr (assoc color *color-codes*))))
+    (unless code
+      (error "Unsupported color: ~A" color))
+    (format stream "~C[~Am" #\Esc code)))
+
+(defun reset-color (&optional stream)
+  (format stream "~C[0m" #\Esc))
+
 (defun color-text (color text)
   (if *enable-colors*
       (if (= (length text) 0)
           text
-          (let ((code (cdr (assoc color *color-codes*))))
-            (unless code
-              (error "Unsupported color: ~A" color))
-            (format nil "~C[~Am~A~C[0m"
-                    #\Esc
-                    code
-                    text
-                    #\Esc)))
+          (with-output-to-string (s)
+            (start-color color s)
+            (format s text)
+            (reset-color s)))
       text))
 
 (defun print-badge (label color &optional (stream *standard-output*))
@@ -71,44 +77,56 @@
   (print-first-line "AC" :green test-name took-ms))
 
 (defun diff (a b)
-  (let ((lcs (lcs a b)))
+  (let ((ops (edit-operations a b)))
     (let ((stream (make-indent-stream *standard-output*
-                                      :prefix (color-text :red "- "))))
+                                      :prefix (color-text :red "- ")))
+          (ops (remove #\D ops)))
       (with-indent (stream +3)
-        (loop with (lcs-char . lcs-rest) = lcs
-              for i from 0
-              for ch across b
-              if (null lcs-char)
-              do (princ (if (graphic-char-p ch)
-                            (color-text :red (princ-to-string ch))
-                            ch)
-                        stream)
-              else if (char= ch lcs-char)
-              do (princ ch stream)
-                 (setf lcs-char (pop lcs-rest))
-              else
-              do (princ (color-text :red (princ-to-string ch)) stream))
-        (unless (stream-fresh-line-p stream)
+        (let ((color nil))
+          (loop
+            for op = (pop ops)
+            for ch across b
+            if (or (null op)
+                   (char= op #\M))
+            do (when color
+                 (reset-color stream)
+                 (setf color nil))
+               (princ ch stream)
+            else
+            do (unless color
+                 (start-color :red stream)
+                 (setf color t))
+               (princ ch stream))
+          (when color
+            (reset-color stream)))
+        (when (or (zerop (length b))
+                  (not (new-line-char-p (aref b (1- (length b))))))
           (format stream "~&~A~%"
                   (color-text :gray "[no newline at the end]")))))
     (format t "~&")
     (let ((stream (make-indent-stream *standard-output*
-                                      :prefix (color-text :green "+ "))))
+                                      :prefix (color-text :green "+ ")))
+          (ops (remove #\A ops)))
       (with-indent (stream +3)
-        (loop with (lcs-char . lcs-rest) = lcs
-              for i from 0
-              for ch across a
-              if (null lcs-char)
-              do (princ (if (graphic-char-p ch)
-                            (color-text :green (princ-to-string ch))
-                            ch)
-                        stream)
-              else if (char= ch lcs-char)
-              do (princ ch stream)
-                 (setf lcs-char (pop lcs-rest))
-              else
-              do (princ (color-text :green (princ-to-string ch)) stream))
-        (unless (stream-fresh-line-p stream)
+        (let ((color nil))
+          (loop
+            for op = (pop ops)
+            for ch across a
+            if (or (null op)
+                   (char= op #\M))
+            do (when color
+                 (reset-color stream)
+                 (setf color nil))
+            (princ ch stream)
+            else
+            do (unless color
+                 (start-color :green stream)
+                 (setf color t))
+            (princ ch stream))
+          (when color
+            (reset-color stream)))
+        (when (or (zerop (length a))
+                  (not (new-line-char-p (aref a (1- (length a))))))
           (format stream "~&~A~%"
                   (color-text :gray "[no newline at the end]")))))
     (format t "~2&")))
