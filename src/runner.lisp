@@ -37,7 +37,8 @@
     ("cpp" . (("compile" . ("g++" "-std=gnu++1y" "-O2" ,@(mapcar (lambda (dir) (format nil "-I~A" dir))
                                                                  *cpp-include-locations*)
                             "-o" compile-to file))
-              ("execute" . (compile-to))))))
+              ("execute" . (compile-to))))
+    ("scheme" . (("execute" . ("gosh" file))))))
 
 (defun render-command (command-template values)
   (mapcar (lambda (x)
@@ -126,6 +127,7 @@
       ((string= type "rb") "ruby")
       ((string= type "js") "javascript")
       ((string= type "clj") "clojure")
+      ((string= type "scm") "scheme")
       (t type))))
 
 (defun compile-main-file (file filetype &key compile-to)

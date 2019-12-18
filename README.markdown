@@ -140,6 +140,7 @@ Expected result is here again...
 * Node.js
 * Python
 * Ruby
+* Scheme
 
 ## Author
 
