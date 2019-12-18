@@ -27,6 +27,15 @@ exec ros -Q -m getac -L sbcl-bin -- $0 "$@"
   "File type to test. The default will be detected by the file extension."
   (list :filetype type))
 
+(defoption "timeout" (:short "T") (seconds)
+  #.(format nil "Time limit for each test cases. (Default: ~A)" getac:*default-timeout*)
+  (let ((sec (handler-case (read-from-string seconds)
+               (error ()
+                 (error "Invalid value for timeout: ~A" seconds)))))
+    (unless (numberp sec)
+      (error "Invalid value for timeout: ~A" seconds))
+    (list :timeout sec)))
+
 (defoption "disable-colors" () ()
   "Turn off colors."
   (setf getac:*enable-colors* nil)

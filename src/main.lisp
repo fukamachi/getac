@@ -17,6 +17,7 @@
                 #:report-compilation-error
                 #:report-runtime-error
                 #:report-time-limit-exceeded
+                #:report-canceled
                 #:print-summary)
   (:import-from #:getac/timer
                 #:*max-execution-time*
@@ -24,10 +25,13 @@
                 #:deadline-timeout-seconds)
   (:export #:*enable-colors*
            #:*max-execution-time*
+           #:*default-timeout*
            #:run))
 (in-package #:getac)
 
-(defun run (file &key test filetype (fail-fast t))
+(defparameter *default-timeout* 2)
+
+(defun run (file &key test filetype (fail-fast t) (timeout *default-timeout*))
   (let* ((file (normalize-pathname file))
          (filetype (or filetype
                        (detect-filetype file)))
@@ -48,23 +52,28 @@
                    (multiple-value-bind (result took-ms)
                        (funcall handler input)
                      (check-type result string)
-                     (if (equal result expected)
-                         (progn
-                           (incf passed-count)
-                           (report-accepted test-name took-ms))
-                         (progn
-                           (report-wrong-answer test-name input expected result took-ms)
-                           (incf failed-count)
-                           (when fail-fast
-                             (return))
-                           (write-char #\Newline))))
+                     (cond
+                       ((not (equal result expected))
+                        (report-wrong-answer test-name input expected result took-ms)
+                        (incf failed-count)
+                        (when fail-fast
+                          (return))
+                        (write-char #\Newline))
+                       ((< (* timeout 1000) took-ms)
+                        (report-time-limit-exceeded test-name (/ took-ms 1000.0))
+                        (incf failed-count)
+                        (when fail-fast
+                          (return))
+                        (write-char #\Newline))
+                       (t (incf passed-count)
+                          (report-accepted test-name took-ms))))
                  (execution-error (e)
                    (report-runtime-error test-name input e)
                    (incf failed-count)
                    (when fail-fast
                      (return)))
                  (deadline-timeout (e)
-                   (report-time-limit-exceeded test-name input (deadline-timeout-seconds e))
+                   (report-canceled test-name input (deadline-timeout-seconds e))
                    (incf failed-count)
                    (when fail-fast
                      (return)))))

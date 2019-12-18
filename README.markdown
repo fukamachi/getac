@@ -15,6 +15,8 @@ OPTIONS:
         Specify a file to read test cases. (Default: <file>.txt)
     -f, --filetype=<type>
         File type to test. The default will be detected by the file extension.
+    -T, --timeout=<seconds>
+        Time limit for each test cases. (Default: 2)
     --disable-colors
         Turn off colors.
     -F, --no-fail-fast

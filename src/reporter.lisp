@@ -16,6 +16,7 @@
            #:report-runtime-error
            #:report-compilation-error
            #:report-time-limit-exceeded
+           #:report-canceled
            #:print-summary))
 (in-package #:getac/reporter)
 
@@ -165,7 +166,13 @@
                                   (subprocess-error-command error)
                                   (subprocess-error-output error)))))))
 
-(defun report-time-limit-exceeded (test-name input seconds)
+(defun report-time-limit-exceeded (test-name seconds)
+  (print-first-line "TLE" :red test-name)
+  (format t "~&   ~A~%"
+          (color-text :gray
+                      (format nil "Took ~A seconds and time limit exceeded" seconds))))
+
+(defun report-canceled (test-name input seconds)
   (print-first-line "TLE" :red test-name)
   (%print-input input)
   (format t "~2&   ~A~%"
