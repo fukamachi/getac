@@ -53,9 +53,6 @@ After the installation, `getac` command will be installed at `~/.roswell/bin`.
 Install [SBCL](http://sbcl.org/) if not already installed.
 
 ```
-$ mkdir -p ~/common-lisp
-$ cd ~/common-lisp
-$ git clone https://github.com/trivial-gray-streams/trivial-gray-streams
 $ git clone https://github.com/fukamachi/getac
 $ cd getac
 $ make
