@@ -107,7 +107,7 @@
     (format t "~&")
     (let ((stream (make-indent-stream *standard-output*
                                       :prefix (color-text :green "+ ")))
-          (ops (remove #\A ops)))
+          (ops (remove #\I ops)))
       (with-indent (stream +3)
         (let ((color nil))
           (loop
@@ -118,12 +118,12 @@
             do (when color
                  (reset-color stream)
                  (setf color nil))
-            (princ ch stream)
+               (princ ch stream)
             else
             do (unless color
                  (start-color :green stream)
                  (setf color t))
-            (princ ch stream))
+               (princ ch stream))
           (when color
             (reset-color stream)))
         (when (or (zerop (length a))
