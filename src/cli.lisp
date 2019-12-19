@@ -156,8 +156,7 @@
           (handler-case (parse-argv argv)
             (cli-error (e)
               (format *error-output* "~&~A~%" e)
-              (print-usage)
-              (uiop:quit -1)))
+              (print-usage)))
         (let ((filename (pop argv)))
           (unless filename
             (format *error-output* "~&Missing a file to test.~%")
@@ -165,7 +164,10 @@
           (when argv
             ;; Allow options after the filename
             (multiple-value-bind (more-options argv)
-                (parse-argv argv)
+                (handler-case (parse-argv argv)
+                  (cli-error (e)
+                    (format *error-output* "~&~A~%" e)
+                    (print-usage)))
               (when argv
                 (format *error-output* "Extra arguments: ~{~A~^ ~}~%" argv)
                 (print-usage))
