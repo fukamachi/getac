@@ -18,9 +18,9 @@
         #+darwin "/usr/local/include/boost"))
 
 (defvar *default-commands*
-  `(#+roswell
+  `(#+ros.init
     ("lisp" . (("execute" . ("ros" "run" "--" "--script" file))))
-    #-roswell
+    #-ros.init
     ("lisp" . (("execute" . ("sbcl" "--script" file))))
     ("python" . (("execute" . ("python" "-B" file))))
     ("python2" . (("execute" . ("python2" "-B" file))))
