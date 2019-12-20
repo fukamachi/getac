@@ -38,6 +38,17 @@ $ getac -f pypy3 main.py
 
 ## Installation
 
+### via Homebrew (for macOS/Linux)
+
+Install [Homebrew](https://brew.sh/) if not already installed.
+
+```
+$ brew tap fukamachi/getac
+$ brew install getac
+```
+
+### Manually
+
 Install [SBCL](http://sbcl.org/) if not already installed.
 
 ```
