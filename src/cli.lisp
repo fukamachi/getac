@@ -183,7 +183,9 @@
               (uiop:quit -1))))
    #+sbcl (sb-sys:interactive-interrupt () (uiop:quit -1 t))))
 
-(defun main ()
-  (let ((argv #+sbcl (rest sb-ext:*posix-argv*)
-              #-sbcl uiop:*command-line-arguments*))
+(defun main (&optional (argv nil argv-supplied-p))
+  (let ((argv (if argv-supplied-p
+                  (rest argv)
+                  (or #+sbcl (rest sb-ext:*posix-argv*)
+                      #-sbcl uiop:*command-line-arguments*))))
     (apply #'cli-main argv)))
