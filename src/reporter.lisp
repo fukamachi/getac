@@ -37,23 +37,25 @@
     (:gray . 90)))
 
 (defun start-color (color &optional stream)
-  (let ((code (cdr (assoc color *color-codes*))))
-    (unless code
-      (error "Unsupported color: ~A" color))
-    (format stream "~C[~Am" #\Esc code)))
+  (when *enable-colors*
+    (let ((code (cdr (assoc color *color-codes*))))
+      (unless code
+        (error "Unsupported color: ~A" color))
+      (format stream "~C[~Am" #\Esc code)))
+  (values))
 
 (defun reset-color (&optional stream)
-  (format stream "~C[0m" #\Esc))
+  (when *enable-colors*
+    (format stream "~C[0m" #\Esc))
+  (values))
 
 (defun color-text (color text)
-  (if *enable-colors*
-      (if (= (length text) 0)
-          text
-          (with-output-to-string (s)
-            (start-color color s)
-            (format s text)
-            (reset-color s)))
-      text))
+  (if (= (length text) 0)
+      text
+      (with-output-to-string (s)
+        (start-color color s)
+        (format s text)
+        (reset-color s))))
 
 (defun print-badge (label color &optional (stream *standard-output*))
   (check-type label string)
