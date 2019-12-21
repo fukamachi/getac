@@ -142,6 +142,7 @@ Expected result is here again...
 * Clojure
 * Common Lisp
 * Go
+* Haskell
 * Java
 * Node.js
 * Python
