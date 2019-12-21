@@ -42,7 +42,7 @@
                             "-o" compile-to file))
               ("execute" . (compile-to))))
     ("scheme" . (("execute" . ("gosh" file))))
-    ("haskell" . (("compile" . ("stack" "ghc" "--" file "-o" compile-to))
+    ("haskell" . (("compile" . ("stack" "ghc" "--" "-o" compile-to "-odir" compile-in "-hidir" compile-in "-O2" file))
                   ("execute" . (compile-to))))))
 
 (defun render-command (command-template values)
