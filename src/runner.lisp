@@ -41,7 +41,9 @@
                                                                  *cpp-include-locations*)
                             "-o" compile-to file))
               ("execute" . (compile-to))))
-    ("scheme" . (("execute" . ("gosh" file))))))
+    ("scheme" . (("execute" . ("gosh" file))))
+    ("haskell" . (("compile" . ("stack" "ghc" "--" file "-o" compile-to))
+                  ("execute" . (compile-to))))))
 
 (defun render-command (command-template values)
   (mapcar (lambda (x)
@@ -131,6 +133,7 @@
       ((string= type "js") "javascript")
       ((string= type "clj") "clojure")
       ((string= type "scm") "scheme")
+      ((string= type "hs") "haskell")
       (t type))))
 
 (defun compile-main-file (file filetype &key compile-to)
