@@ -108,7 +108,7 @@
   (check-type file pathname)
   (check-type compile-to (or null pathname))
   (let* ((compile-to (or compile-to
-                         (uiop:with-temporary-file (:pathname file :keep t) file)))
+                         (uiop:with-temporary-file (:pathname file) file)))
          (command (render-command command-template
                                   `((file . ,(uiop:native-namestring file))
                                     (compile-to . ,(uiop:native-namestring compile-to))
