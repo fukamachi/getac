@@ -1,12 +1,15 @@
 main: build
 
-trivial-gray-streams-master.tar.gz:
-	curl -L https://github.com/trivial-gray-streams/trivial-gray-streams/archive/master.tar.gz -o trivial-gray-streams-master.tar.gz
+TRIVIAL_GRAY_STREAMS_COMMIT = ebd59b1afed03b9dc8544320f8f432fdf92ab010
 
-trivial-gray-streams-master: trivial-gray-streams-master.tar.gz
-	tar zxf trivial-gray-streams-master.tar.gz
+trivial-gray-streams.tar.gz:
+	curl -L https://github.com/trivial-gray-streams/trivial-gray-streams/archive/$(TRIVIAL_GRAY_STREAMS_COMMIT).tar.gz -o trivial-gray-streams.tar.gz
 
-bin/getac: trivial-gray-streams-master
+trivial-gray-streams: trivial-gray-streams.tar.gz
+	tar zxf trivial-gray-streams.tar.gz
+	mv trivial-gray-streams-$(TRIVIAL_GRAY_STREAMS_COMMIT) trivial-gray-streams
+
+bin/getac: trivial-gray-streams
 	mkdir -p bin
 	sbcl --eval '(require :asdf)' \
 		--eval '(push #P"trivial-gray-streams-master/" asdf:*central-registry*)' \
@@ -25,5 +28,5 @@ uninstall:
 	rm /usr/local/bin/getac
 
 clean:
-	rm -f bin/getac trivial-gray-streams-master.tar.gz
-	rm -rf trivial-gray-streams-master
+	rm -f bin/getac trivial-gray-streams.tar.gz
+	rm -rf trivial-gray-streams
