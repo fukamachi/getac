@@ -11,10 +11,11 @@
                  (:module "others"
                   :pathname ""
                   :components
-                  ((:file "runner" :depends-on ("timer"))
+                  ((:file "runner" :depends-on ("timer" "shell"))
                    (:file "testcase")
                    (:file "reporter" :depends-on ("runner" "diff" "indent-stream"))
                    (:file "timer")
+                   (:file "shell")
                    (:file "diff")
                    (:file "indent-stream")))))
                (:module "utils"

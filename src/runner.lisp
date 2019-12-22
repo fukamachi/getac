@@ -3,6 +3,8 @@
         #:getac/utils)
   (:import-from #:getac/timer
                 #:with-deadline)
+  (:import-from #:getac/shell
+                #:run-program)
   (:export #:detect-filetype
            #:compile-main-file
            #:make-execution-handler
@@ -92,10 +94,10 @@
       (values
         (with-output-to-string (s)
           (handler-case (with-took-ms took-ms
-                          (uiop:run-program command
-                                            :input in
-                                            :output s
-                                            :error-output errout))
+                          (run-program command
+                                       :input in
+                                       :output s
+                                       :error-output errout))
             (uiop:subprocess-error ()
               (error 'execution-error
                      :command command
@@ -114,10 +116,10 @@
                                     (compile-to . ,(uiop:native-namestring compile-to))
                                     (compile-in . ,(uiop:native-namestring (uiop:pathname-directory-pathname compile-to))))))
          (errout (make-string-output-stream)))
-    (handler-case (uiop:run-program command
-                                    :input t
-                                    :output t
-                                    :error-output errout)
+    (handler-case (run-program command
+                               :input :interactive
+                               :output :interactive
+                               :error-output errout)
       (uiop:subprocess-error ()
         (error 'compilation-error
                :command command
