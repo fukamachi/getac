@@ -80,64 +80,95 @@
   (print-first-line "AC" :green test-name took-ms))
 
 (defun diff (a b)
-  (let ((ops (edit-operations a b)))
-    (let ((stream (make-indent-stream *standard-output*
-                                      :prefix (color-text :red "- ")))
-          (ops (remove #\D ops)))
-      (with-indent (stream +3)
-        (let ((color nil))
-          (loop
-            for op = (pop ops)
-            for ch across b
-            if (or (null op)
-                   (char= op #\M))
-            do (when color
-                 (reset-color stream)
-                 (setf color nil))
-               (princ ch stream)
-            else
-            do (unless color
-                 (start-color :red stream)
-                 (setf color t))
-               (princ ch stream))
-          (when color
-            (reset-color stream)))
-        (when (or (zerop (length b))
-                  (not (new-line-char-p (aref b (1- (length b))))))
-          (format stream "~&~A~%"
-                  (color-text :gray "[no newline at the end]")))))
-    (format t "~&")
-    (let ((stream (make-indent-stream *standard-output*
-                                      :prefix (color-text :green "+ ")))
-          (ops (remove #\I ops)))
-      (with-indent (stream +3)
-        (let ((color nil))
-          (loop
-            for op = (pop ops)
-            for ch across a
-            if (or (null op)
-                   (char= op #\M))
-            do (when color
-                 (reset-color stream)
-                 (setf color nil))
-               (princ ch stream)
-            else
-            do (unless color
-                 (start-color :green stream)
-                 (setf color t))
-               (princ ch stream))
-          (when color
-            (reset-color stream)))
-        (when (or (zerop (length a))
-                  (not (new-line-char-p (aref a (1- (length a))))))
-          (format stream "~&~A~%"
-                  (color-text :gray "[no newline at the end]")))))
-    (format t "~&")))
+  (cond
+    ((null a)
+     (let ((stream (make-indent-stream *standard-output*
+                                       :prefix (color-text :green "+ ")
+                                       :level 3)))
+       (princ b stream)))
+    ((null b)
+     (let ((stream (make-indent-stream *standard-output*
+                                       :prefix (color-text :red "- ")
+                                       :level 3)))
+       (princ a stream)))
+    (t
+     (let ((ops (edit-operations a b)))
+       (if (every (lambda (x) (char= x #\M)) ops)
+           (let ((stream (make-indent-stream *standard-output* :level 5)))
+             (princ a stream))
+           (progn
+             (let ((stream (make-indent-stream *standard-output*
+                                               :prefix (color-text :red "- ")))
+                   (ops (remove #\D ops)))
+               (with-indent (stream +3)
+                            (let ((color nil))
+                              (loop
+                                for op = (pop ops)
+                                for ch across b
+                                if (or (null op)
+                                       (char= op #\M))
+                                do (when color
+                                     (reset-color stream)
+                                     (setf color nil))
+                                (princ ch stream)
+                                else
+                                do (unless color
+                                     (start-color :red stream)
+                                     (setf color t))
+                                (princ ch stream))
+                              (when color
+                                (reset-color stream)))
+                            (when (or (zerop (length b))
+                                      (not (new-line-char-p (aref b (1- (length b))))))
+                              (format stream "~&~A~%"
+                                      (color-text :gray "[no newline at the end]")))))
+             (format t "~&")
+             (let ((stream (make-indent-stream *standard-output*
+                                               :prefix (color-text :green "+ ")))
+                   (ops (remove #\I ops)))
+               (with-indent (stream +3)
+                            (let ((color nil))
+                              (loop
+                                for op = (pop ops)
+                                for ch across a
+                                if (or (null op)
+                                       (char= op #\M))
+                                do (when color
+                                     (reset-color stream)
+                                     (setf color nil))
+                                (princ ch stream)
+                                else
+                                do (unless color
+                                     (start-color :green stream)
+                                     (setf color t))
+                                (princ ch stream))
+                              (when color
+                                (reset-color stream)))
+                            (when (or (zerop (length a))
+                                      (not (new-line-char-p (aref a (1- (length a))))))
+                              (format stream "~&~A~%"
+                                      (color-text :gray "[no newline at the end]"))))))))))
+  (format t "~&"))
 
 (defun %print-input (input)
   (format t "~2&")
   (let ((stream (make-indent-stream *standard-output* :level 3)))
     (princ input stream)))
+
+(defun by-line-iter (str)
+  (let ((start 0)
+        (end (length str))
+        eofp)
+    (lambda ()
+      (unless eofp
+        (let ((pos (position #\Newline str :test #'char= :start start)))
+          (if pos
+              (prog1 (subseq str start (1+ pos))
+                (setf start (1+ pos))
+                (when (= start end)
+                  (setf eofp t)))
+              (prog1 (subseq str start)
+                (setf eofp t))))))))
 
 (defun report-wrong-answer (test-name input expected actual took-ms)
   (print-first-line "WA" :red test-name took-ms)
@@ -145,7 +176,12 @@
   (format t "~2&   ~A ~A~2%"
           (color-text :red "- actual")
           (color-text :green "+ expected"))
-  (diff expected actual))
+  (loop with expected-iter = (by-line-iter expected)
+        with actual-iter = (by-line-iter actual)
+        for expected-line = (funcall expected-iter)
+        for actual-line = (funcall actual-iter)
+        while (or expected-line actual-line)
+        do (diff expected-line actual-line)))
 
 (defun report-compilation-error (error)
   (print-first-line "CE" :red "Compilation failed.")
