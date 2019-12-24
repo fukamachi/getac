@@ -14,15 +14,34 @@ const atcoder = function() {
     return testcases;
 };
 
-const aoj = function() {
-    let testcases = '';
-    const pre = document.querySelectorAll('.problemBody pre');
-    let h2 = document.querySelectorAll('.problemBody h2');
-    h2 = Array.from(h2).slice(h2.length - pre.length)
-    for (var i=0; i<pre.length; ++i) {
-        testcases += '==== ' + h2[i].innerHTML + ' ====\n';
-        testcases += pre[i].innerHTML;
-    }
+let aoj = function() {
+    let testcases = '', isOutput = false, isDone = false;
+    const problemBody = document.getElementsByClassName('problemBody')[0];
+    Array.from(problemBody.childNodes).filter(function(node) { return node.nodeType === 1 }).reverse().forEach(function(node) {
+        if (!isDone) {
+            const tagName = node.tagName.toLowerCase();
+            switch (tagName) {
+                case 'pre':
+                    testcases = node.innerHTML + testcases;
+                    isOutput = !isOutput
+                    break;
+                case 'h2':
+                    if (testcases) {
+                        if (isOutput) {
+                            testcases = '--------\n' + testcases;
+                        }
+                        else {
+                            testcases = '==== ' + node.innerHTML + ' ====\n' + testcases;
+                        }
+                    }
+                    break;
+                default:
+                    if (testcases) {
+                        isDone = true;
+                    }
+            }
+        }
+    });
     return testcases;
 };
 
