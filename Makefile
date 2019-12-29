@@ -12,7 +12,7 @@ trivial-gray-streams: trivial-gray-streams.tar.gz
 bin/getac: trivial-gray-streams
 	mkdir -p bin
 	sbcl --eval '(require :asdf)' \
-		--eval '(push #P"trivial-gray-streams-master/" asdf:*central-registry*)' \
+		--eval '(push #P"trivial-gray-streams/" asdf:*central-registry*)' \
 		--eval '(push #P"./" asdf:*central-registry*)' \
 		--eval '(asdf:load-system :getac)' \
 		--eval '(sb-ext:save-lisp-and-die "bin/getac" :toplevel (function getac/cli:main) :executable t :save-runtime-options t)'
