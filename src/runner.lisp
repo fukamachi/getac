@@ -116,7 +116,7 @@
                                     (compile-to . ,(uiop:native-namestring compile-to))
                                     (compile-in . ,(uiop:native-namestring (uiop:pathname-directory-pathname compile-to))))))
          (errout (make-string-output-stream)))
-    (handler-case (run-program command
+    (handler-case (uiop:run-program command
                                :input :interactive
                                :output :interactive
                                :error-output errout)
