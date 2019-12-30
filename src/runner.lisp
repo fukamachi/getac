@@ -97,11 +97,12 @@
                           (run-program command
                                        :input in
                                        :output s
-                                       :error-output errout))
-            (uiop:subprocess-error ()
-              (error 'execution-error
-                     :command command
-                     :output (get-output-stream-string errout))))
+                                       :error-output :stream))
+            (uiop:subprocess-error (e)
+              (let ((process (uiop:subprocess-error-process e)))
+                (error 'execution-error
+                       :command command
+                       :output (uiop:process-info-error-output process)))))
           (format *error-output* (get-output-stream-string errout)))
         took-ms))))
 
@@ -114,16 +115,16 @@
          (command (render-command command-template
                                   `((file . ,(uiop:native-namestring file))
                                     (compile-to . ,(uiop:native-namestring compile-to))
-                                    (compile-in . ,(uiop:native-namestring (uiop:pathname-directory-pathname compile-to))))))
-         (errout (make-string-output-stream)))
+                                    (compile-in . ,(uiop:native-namestring (uiop:pathname-directory-pathname compile-to)))))))
     (handler-case (run-program command
                                :input :interactive
                                :output :interactive
-                               :error-output errout)
-      (uiop:subprocess-error ()
-        (error 'compilation-error
-               :command command
-               :output (get-output-stream-string errout))))
+                               :error-output :stream)
+      (uiop:subprocess-error (e)
+        (let ((process (uiop:subprocess-error-process e)))
+          (error 'compilation-error
+                 :command command
+                 :output (uiop:process-info-error-output process)))))
     compile-to))
 
 (defun detect-filetype (file)
