@@ -15,7 +15,8 @@
     (or (and (null start)
              (<= 4 (length line))
              (values t nil))
-        (and (<= 2 start)
+        (and (not (null start))
+             (<= 2 start)
              (let ((end (position-if (lambda (x)
                                        (char= x #\=))
                                      line
