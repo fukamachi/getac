@@ -141,7 +141,11 @@
 
 (defoption "version" (:short "V") ()
   "Print version."
-  (format *error-output* "~&v~A~%" (asdf:component-version (asdf:find-system '#:getac)))
+  (format *error-output* "~&getac v~A running on ~A ~A~@[ (with ASDF ~A)~]~%"
+          (asdf:component-version (asdf:find-system '#:getac))
+          (lisp-implementation-type)
+          (lisp-implementation-version)
+          #+asdf (asdf:asdf-version) #-asdf nil)
   (uiop:quit -1))
 
 (defoption "help" (:short "h") ()

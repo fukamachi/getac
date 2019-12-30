@@ -4,6 +4,7 @@
 
 * Add Haskell support (thanks to @nganhkhoa)
 * Include bookmarklet.js to generate testcases (Experimental)
+* Print also the versions of Lisp and ASDF by 'getac --version'
 * bugfix: Ensure compilation/execution processes are terminated even when TLE.
 * bugfix: Fix a TYPE-ERROR if the testcase ends with a newline.
 
