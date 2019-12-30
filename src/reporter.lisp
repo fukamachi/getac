@@ -151,22 +151,24 @@
   (print-first-line "CE" :red "Compilation failed.")
   (let ((stream (make-indent-stream *standard-output*)))
     (with-indent (stream +3)
-      (format stream "~&~A~%"
+      (format stream "~&~A~2%"
               (color-text :gray
-                          (format nil "While executing ~{~A~^ ~}~2%  ~A"
-                                  (subprocess-error-command error)
-                                  (subprocess-error-output error)))))))
+                          (format nil "While executing ~{~A~^ ~}"
+                                  (subprocess-error-command error)))))
+    (with-indent (stream +5)
+      (format stream "~A~%" (color-text :gray (subprocess-error-output error))))))
 
 (defun report-runtime-error (test-name input error)
   (print-first-line "RE" :red test-name)
   (%print-input input)
   (let ((stream (make-indent-stream *standard-output*)))
     (with-indent (stream +3)
-      (format stream "~2&~A~%"
+      (format stream "~2&~A~2%"
               (color-text :gray
-                          (format nil "While executing ~{~A~^ ~}~2%  ~A"
-                                  (subprocess-error-command error)
-                                  (subprocess-error-output error)))))))
+                          (format nil "While executing ~{~A~^ ~}"
+                                  (subprocess-error-command error)))))
+    (with-indent (stream +5)
+      (format stream "~A~%" (color-text :gray (subprocess-error-output error))))))
 
 (defun report-time-limit-exceeded (test-name seconds)
   (print-first-line "TLE" :red test-name)

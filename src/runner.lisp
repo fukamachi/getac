@@ -102,7 +102,10 @@
               (let ((process (uiop:subprocess-error-process e)))
                 (error 'execution-error
                        :command command
-                       :output (uiop:process-info-error-output process)))))
+                       :output (with-output-to-string (s)
+                                 (uiop:copy-stream-to-stream
+                                   (uiop:process-info-error-output process)
+                                   s))))))
           (format *error-output* (get-output-stream-string errout)))
         took-ms))))
 
@@ -124,7 +127,10 @@
         (let ((process (uiop:subprocess-error-process e)))
           (error 'compilation-error
                  :command command
-                 :output (uiop:process-info-error-output process)))))
+                 :output (with-output-to-string (s)
+                           (uiop:copy-stream-to-stream
+                             (uiop:process-info-error-output process)
+                             s))))))
     compile-to))
 
 (defun detect-filetype (file)
