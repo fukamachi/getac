@@ -77,13 +77,36 @@
                      (format buffer "~A~%" line))))))))))
     (nreverse results)))
 
-(defun read-from-file (file)
-  (let ((file (normalize-pathname file)))
-    (uiop:with-input-file (in file)
-      (read-from-stream in))))
+(defun read-from-file (test-file-or-directory)
+  (if (uiop:file-pathname-p test-file-or-directory)
+      (uiop:with-input-file (in test-file-or-directory)
+        (read-from-stream in))
+      (let ((input-files (uiop:directory-files test-file-or-directory "*.in")))
+        (loop for input-file in input-files
+              for output-file = (make-pathname :name (pathname-name input-file)
+                                               :type "out"
+                                               :defaults input-file)
+              if (not (uiop:file-exists-p output-file))
+              do (warn "'~A' doesn't have corresponding '.out' file. Skipped." (uiop:native-namestring input-file))
+              else
+              collect (list (pathname-name input-file)
+                            (uiop:read-file-string input-file)
+                            (uiop:read-file-string output-file))))))
 
-(defun default-testcase-file (file)
+(defun default-testcase (file)
   (let ((file (normalize-pathname file)))
-    (make-pathname :name (pathname-name file)
-                   :type *testcase-file-extension*
-                   :defaults file)))
+    (block nil
+      (let ((test-file (make-pathname :name (pathname-name file)
+                                      :type *testcase-file-extension*
+                                      :defaults file)))
+        (when (uiop:file-exists-p test-file)
+          (return test-file)))
+      (let ((test-directory (merge-pathnames #P"test/"
+                                             (uiop:pathname-directory-pathname file))))
+        (when (uiop:directory-exists-p test-directory)
+          (return test-directory)))
+      (let ((tests-directory (merge-pathnames #P"tests/"
+                                              (uiop:pathname-directory-pathname file))))
+        (when (uiop:directory-exists-p tests-directory)
+          (return tests-directory)))
+      (error "Couldn't find test case file(s)."))))

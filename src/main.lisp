@@ -9,7 +9,7 @@
                 #:compilation-error)
   (:import-from #:getac/testcase
                 #:read-from-file
-                #:default-testcase-file)
+                #:default-testcase)
   (:import-from #:getac/reporter
                 #:*enable-colors*
                 #:report-accepted
@@ -35,14 +35,14 @@
   (let* ((file (normalize-pathname file))
          (filetype (or filetype
                        (detect-filetype file)))
-         (testcase-file (or test
-                            (default-testcase-file file))))
+         (testcase (or test
+                       (default-testcase file))))
     (let* ((compile-to (handler-case (compile-main-file file filetype)
                          (compilation-error (e)
                            (report-compilation-error e)
                            (return-from run nil))))
            (handler (make-execution-handler file filetype :compile-to compile-to))
-           (test-cases (read-from-file testcase-file))
+           (test-cases (read-from-file testcase))
            (all-test-count (length test-cases))
            (passed-count 0)
            (failed-count 0))

@@ -98,6 +98,8 @@ If some test cases are failed, it shows 'WA' (wrong answer).
 
 ## Format of test cases
 
+### Single .txt file
+
 Let's start with this very minimal example which contains a single test case:
 
 ```
@@ -133,6 +135,22 @@ Expected result is here...
 Second test case
 ------------------
 Expected result is here again...
+```
+
+### Separated input/output files
+
+If the single test file couldn't find, getac tries to get from `./test/` and `./tests/` directory, which contains test cases as separated input/output files.
+
+The directory structure is like this:
+
+```
+.
+├── main.lisp
+└── tests
+    ├── sample-1.in
+    ├── sample-1.out
+    ├── sample-2.in
+    └── sample-2.out
 ```
 
 ## Supported languages
