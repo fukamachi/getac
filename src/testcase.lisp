@@ -78,20 +78,21 @@
     (nreverse results)))
 
 (defun read-from-file (test-file-or-directory)
-  (if (uiop:file-pathname-p test-file-or-directory)
-      (uiop:with-input-file (in test-file-or-directory)
-        (read-from-stream in))
-      (let ((input-files (uiop:directory-files test-file-or-directory "*.in")))
-        (loop for input-file in input-files
-              for output-file = (make-pathname :name (pathname-name input-file)
-                                               :type "out"
-                                               :defaults input-file)
-              if (not (uiop:file-exists-p output-file))
-              do (warn "'~A' doesn't have corresponding '.out' file. Skipped." (uiop:native-namestring input-file))
-              else
-              collect (list (pathname-name input-file)
-                            (uiop:read-file-string input-file)
-                            (uiop:read-file-string output-file))))))
+  (let ((test-file-or-directory (normalize-pathname test-file-or-directory t)))
+    (if (uiop:file-pathname-p test-file-or-directory)
+        (uiop:with-input-file (in test-file-or-directory)
+          (read-from-stream in))
+        (let ((input-files (uiop:directory-files test-file-or-directory "*.in")))
+          (loop for input-file in input-files
+                for output-file = (make-pathname :name (pathname-name input-file)
+                                                 :type "out"
+                                                 :defaults input-file)
+                if (not (uiop:file-exists-p output-file))
+                do (warn "'~A' doesn't have corresponding '.out' file. Skipped." (uiop:native-namestring input-file))
+                else
+                collect (list (pathname-name input-file)
+                              (uiop:read-file-string input-file)
+                              (uiop:read-file-string output-file)))))))
 
 (defun default-testcase (file)
   (let ((file (normalize-pathname file)))
