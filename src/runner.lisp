@@ -88,25 +88,24 @@
                                                        (uiop:native-namestring compile-to)))
                                    (compile-in . ,(and compile-to
                                                        (uiop:native-namestring (uiop:pathname-directory-pathname compile-to)))))))
-        (errout (make-string-output-stream))
         (took-ms 0))
     (with-input-from-string (in input)
       (values
-        (with-output-to-string (s)
-          (handler-case (with-took-ms took-ms
-                          (run-program command
-                                       :input in
-                                       :output s
-                                       :error-output errout))
-            (uiop:subprocess-error (e)
-              (let ((process (uiop:subprocess-error-process e)))
-                (error 'execution-error
-                       :command command
-                       :output (with-output-to-string (s)
-                                 (uiop:copy-stream-to-stream
-                                   (uiop:process-info-error-output process)
-                                   s))))))
-          (format *error-output* (get-output-stream-string errout)))
+        (multiple-value-bind (code output errout)
+            (handler-case (with-took-ms took-ms
+                            (run-program command :input in))
+              (uiop:subprocess-error (e)
+                (let ((process (uiop:subprocess-error-process e)))
+                  (error 'execution-error
+                         :command command
+                         :output (with-output-to-string (s)
+                                   (uiop:copy-stream-to-stream
+                                     (uiop:process-info-error-output process)
+                                     s))))))
+          (declare (ignore code))
+          (uiop:copy-stream-to-stream errout *error-output*)
+          (with-output-to-string (s)
+            (uiop:copy-stream-to-stream output s)))
         took-ms))))
 
 (defun compile-code (command-template file &optional compile-to)
@@ -121,8 +120,7 @@
                                     (compile-in . ,(uiop:native-namestring (uiop:pathname-directory-pathname compile-to)))))))
     (handler-case (run-program command
                                :input :interactive
-                               :output :interactive
-                               :error-output :stream)
+                               :output :interactive)
       (uiop:subprocess-error (e)
         (let ((process (uiop:subprocess-error-process e)))
           (error 'compilation-error

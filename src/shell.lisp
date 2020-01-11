@@ -3,8 +3,11 @@
   (:export #:run-program))
 (in-package #:getac/shell)
 
-(defun run-program (command &rest initargs)
-  (let ((process (apply #'uiop:launch-program command initargs)))
+(defun run-program (command &key input (output :stream))
+  (let ((process (uiop:launch-program command
+                                      :input input
+                                      :output output
+                                      :error-output :stream)))
     (unwind-protect
         (let ((code (uiop:wait-process process)))
           (unless (zerop code)
@@ -12,6 +15,8 @@
                    :code code
                    :command command
                    :process process))
-          code)
+          (values code
+                  (uiop:process-info-output process)
+                  (uiop:process-info-error-output process)))
       (when (uiop:process-alive-p process)
         (uiop:terminate-process process :urgent t)))))
