@@ -97,7 +97,7 @@
                           (run-program command
                                        :input in
                                        :output s
-                                       :error-output :stream))
+                                       :error-output errout))
             (uiop:subprocess-error (e)
               (let ((process (uiop:subprocess-error-process e)))
                 (error 'execution-error

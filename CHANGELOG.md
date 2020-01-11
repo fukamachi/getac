@@ -1,5 +1,9 @@
 # getac Changelog
 
+## To be released, v0.9.2
+
+* bugfix: Fix to print standard error while execution. (reported by @nganhkhoa at [#5](https://github.com/fukamachi/getac/issues/5))
+
 ## 2019-12-31, v0.9.1
 
 * Add Haskell support (thanks to @nganhkhoa)
