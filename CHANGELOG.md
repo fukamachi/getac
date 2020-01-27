@@ -1,6 +1,6 @@
 # getac Changelog
 
-## To be released, v0.9.2
+## 2019-01-27, v0.9.2
 
 * Allow to read test cases from a directory containing separated input/output files.
 * bugfix: Fix to print standard error while execution. (reported by @nganhkhoa at [#5](https://github.com/fukamachi/getac/issues/5))
