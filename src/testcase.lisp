@@ -35,7 +35,7 @@
 (defun read-from-stream (stream)
   (let ((eof nil)
         (results '())
-        (header-line (read-line stream nil nil))
+        (header-line (string-right-trim '(#\Return) (read-line stream nil nil)))
         (gen-test-count 0))
     (loop
       (when eof
@@ -49,32 +49,34 @@
                   (unless headerp
                     (format buffer "~A~%" header-line))
                   (loop
-                    (let ((line (read-line stream nil nil)))
+                    (let* ((line (read-line stream nil nil))
+                           (line-trim (string-right-trim '(#\Return) line)))
                       (cond
                         ((null line)
                          (setf eof t)
                          (return))
-                        ((delimiter-line-p line)
+                        ((delimiter-line-p line-trim)
                          (return))
-                        (t (format buffer "~A~%" line)))))
+                        (t (format buffer "~A~%" line-trim)))))
                   (get-output-stream-string buffer))))
           (unless eof
             (let ((buffer (make-string-output-stream)))
               (loop
-                (let ((line (read-line stream nil nil)))
+                (let* ((line (read-line stream nil nil))
+                      (line-trim (string-right-trim '(#\Return) line)))
                   (cond
                     ((null line)
                      (push (list test-name input (get-output-stream-string buffer))
                            results)
                      (setf eof t)
                      (return))
-                    ((header-line-p line)
+                    ((header-line-p line-trim)
                      (push (list test-name input (get-output-stream-string buffer))
                            results)
-                     (setf header-line line)
+                     (setf header-line line-trim)
                      (return))
                     (t
-                     (format buffer "~A~%" line))))))))))
+                     (format buffer "~A~%" line-trim))))))))))
     (nreverse results)))
 
 (defun read-from-file (test-file-or-directory)
